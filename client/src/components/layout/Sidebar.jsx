@@ -1,3 +1,4 @@
+// src/components/layout/Sidebar.jsx
 import { NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
@@ -97,7 +98,7 @@ const Sidebar = () => {
           to="/"
           className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-slate-300 hover:text-emerald-200 hover:bg-slate-900 transition-colors"
         >
-          <span className={`${iconBase}`}>🏠</span>
+          <span className={iconBase}>🏠</span>
           <span>Back to events</span>
         </NavLink>
 

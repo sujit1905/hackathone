@@ -3,7 +3,32 @@
 @tailwind utilities;
 
 body {
-  @apply bg-slate-950 text-slate-100;
-  background-image: theme("backgroundImage.gradient-main");
-  background-attachment: fixed;
+  @apply bg-[#f7f7fb] text-slate-900;
+  background-image: none;
+  background-attachment: scroll;
+}
+/* Custom scrollbar for modern browsers */
+* {
+  scrollbar-width: thin;              /* Firefox */
+  scrollbar-color: #94a3b8 #e5e7eb;   /* thumb, track */
+}
+
+/* Chrome, Edge, Safari */
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #e5e7eb;                /* light grey track */
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #60a5fa, #2563eb);
+  border-radius: 999px;
+}
+
+/* Hover / active state with subtle animation */
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #3b82f6, #1d4ed8);
 }

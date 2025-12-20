@@ -1,218 +1,109 @@
-import { useEffect, useState } from "react";
+// src/pages/Home.jsx
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import api from "../api/axios";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
-import Skeleton from "../components/ui/Skeleton";
-import { useAuth } from "../context/AuthContext";
+
+const slides = [
+  "/images/engineer-4922413_1280.jpg",
+  "/images/istockphoto-1761638528-1024x1024.jpg",
+  "/images/istockphoto-1909556559-1024x1024.jpg",
+  "/images/istockphoto-2186780950-1024x1024.jpg",
+];
 
 const Home = () => {
-  const { user } = useAuth();
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    category: "all",
-    status: "upcoming",
-    search: "",
-  });
-
-  const fetchEvents = async () => {
-    setLoading(true);
-    const params = new URLSearchParams();
-    if (filters.category !== "all")
-      params.append("category", filters.category);
-    if (filters.status) params.append("status", filters.status);
-    if (filters.search) params.append("search", filters.search);
-    const { data } = await api.get(
-      `/api/events?${params.toString()}`
-    );
-    setEvents(data);
-    setLoading(false);
-  };
+  const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    fetchEvents();
-  }, [filters.category, filters.status, filters.search]);
-
-  const handleBookmark = async (id) => {
-    if (!user) return;
-    await api.post(`/api/events/${id}/bookmark`);
-    fetchEvents();
-  };
-
-  const handleRegister = async (id) => {
-    if (!user) return;
-    await api.post(`/api/events/${id}/register`);
-    fetchEvents();
-  };
+    const id = setInterval(() => {
+      setIndex((prev) => (prev + 1) % slides.length);
+    }, 3000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-semibold">
-            All college events, one{" "}
-            <span className="text-sky-400">platform</span>.
-          </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Discover upcoming fests, workshops, hackathons, and
-            more.
-          </p>
+      {/* Grey division below navbar */}
+      <section className="rounded-[24px] md:rounded-[32px] bg-[#f3f4f6] px-4 sm:px-6 md:px-8 pt-8 md:pt-10 pb-10 md:pb-16 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
+          {/* Left: illustration slider */}
+          <div className="relative order-1 lg:order-none">
+            <div className="rounded-3xl bg-[#f2f3f8] overflow-hidden min-h-[260px] sm:min-h-[320px] lg:min-h-[360px] flex items-center justify-center">
+              <img
+                src={slides[index]}
+                alt="Campus events illustration"
+                className="w-full max-w-md object-contain"
+              />
+            </div>
+
+            <div className="flex gap-2 mt-4 justify-center">
+              {slides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setIndex(i)}
+                  className={`h-2.5 rounded-full transition-all ${
+                    i === index ? "w-6 bg-[#1d4ed8]" : "w-2.5 bg-slate-300"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Right: text + buttons */}
+          <div className="space-y-5 sm:space-y-6 text-center lg:text-left">
+            <p className="text-[11px] sm:text-xs font-semibold tracking-[0.2em] uppercase text-[#6366f1]">
+              Campus events, simplified
+            </p>
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold leading-tight text-slate-900">
+              Discover India&apos;s{" "}
+              <span className="text-[#f7a900]">best social</span>
+              <br className="hidden sm:block" />
+              <span className="sm:hidden"> </span>
+              events, <span className="text-[#f7a900]">all</span> in one place
+            </h1>
+
+            <p className="text-sm md:text-base text-slate-500 max-w-xl mx-auto lg:mx-0">
+              Explore events from the most vibrant and creative colleges,
+              ready to inspire and engage your next experience.
+            </p>
+
+            <div className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4">
+              <Link
+                to="/events"
+                className="flex items-center gap-2 px-6 sm:px-7 py-2.5 sm:py-3 rounded-full bg-[#111827] text-white text-sm sm:text-base font-semibold shadow-md"
+              >
+                Explore
+                <span className="text-xs">↗</span>
+              </Link>
+
+              <Link
+                to="/events"
+                className="flex items-center gap-2 px-6 sm:px-7 py-2.5 rounded-full bg-white text-slate-800 text-sm sm:text-base font-semibold shadow-sm"
+              >
+                Events
+                <span className="text-xs">↗</span>
+              </Link>
+
+              <Link
+                to="/clubs"
+                className="flex items-center gap-2 px-6 sm:px-7 py-2.5 rounded-full bg-white text-slate-800 text-sm sm:text-base font-semibold shadow-sm"
+              >
+                Clubs
+                <span className="text-xs">↗</span>
+              </Link>
+            </div>
+
+            <div className="mt-4 rounded-3xl bg-white border border-slate-200 shadow-sm px-4 sm:px-6 py-3.5 sm:py-4 text-xs sm:text-sm text-slate-500 max-w-md mx-auto lg:mx-0">
+              <p className="mb-1">
+                “CampusConnect made it so easy to find and register for
+                events. Loved the experience!”
+              </p>
+              <p className="text-[11px] sm:text-xs text-right text-[#6366f1]">
+                — Student user
+              </p>
+            </div>
+          </div>
         </div>
-
-        <motion.div
-          className="relative w-full sm:w-72"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <input
-            placeholder="Search events..."
-            className="w-full rounded-full bg-slate-900/60 border border-slate-700 px-4 py-2 pl-10 text-sm outline-none focus:border-sky-500 transition"
-            value={filters.search}
-            onChange={(e) =>
-              setFilters({ ...filters, search: e.target.value })
-            }
-          />
-          <span className="absolute left-3 top-2.5 text-xs text-slate-500">
-            🔍
-          </span>
-        </motion.div>
-      </div>
-
-      <div className="flex flex-wrap gap-3 mb-6 text-xs">
-        <button
-          onClick={() =>
-            setFilters({ ...filters, status: "upcoming" })
-          }
-          className={`px-3 py-1 rounded-full border ${
-            filters.status === "upcoming"
-              ? "border-sky-500 bg-sky-500/10 text-sky-300"
-              : "border-slate-700 text-slate-300"
-          }`}
-        >
-          Upcoming
-        </button>
-        <button
-          onClick={() =>
-            setFilters({ ...filters, status: "past" })
-          }
-          className={`px-3 py-1 rounded-full border ${
-            filters.status === "past"
-              ? "border-sky-500 bg-sky-500/10 text-sky-300"
-              : "border-slate-700 text-slate-300"
-          }`}
-        >
-          Past
-        </button>
-
-        {["all", "Tech", "Cultural", "Sports", "Workshop"].map(
-          (cat) => (
-            <button
-              key={cat}
-              onClick={() =>
-                setFilters({ ...filters, category: cat })
-              }
-              className={`px-3 py-1 rounded-full border ${
-                filters.category === cat
-                  ? "border-emerald-500 bg-emerald-500/10 text-emerald-300"
-                  : "border-slate-700 text-slate-300"
-              }`}
-            >
-              {cat === "all" ? "All categories" : cat}
-            </button>
-          )
-        )}
-      </div>
-
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-40" />
-          ))}
-        </div>
-      ) : events.length === 0 ? (
-        <div className="text-center py-16 text-slate-500">
-          <p className="text-sm">
-            No events match these filters yet.
-          </p>
-        </div>
-      ) : (
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: { opacity: 0, y: 12 },
-            visible: {
-              opacity: 1,
-              y: 0,
-              transition: { staggerChildren: 0.04 },
-            },
-          }}
-        >
-          {events.map((event) => (
-            <motion.div
-              key={event._id}
-              variants={{
-                hidden: { opacity: 0, y: 8 },
-                visible: { opacity: 1, y: 0 },
-              }}
-            >
-              <Card className="p-4 flex flex-col justify-between h-full">
-                <div>
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-sm">
-                      {event.title}
-                    </h3>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800/80 text-sky-300 border border-slate-700">
-                      {event.category}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-400 line-clamp-2 mb-3">
-                    {event.description}
-                  </p>
-                  <div className="flex flex-col gap-1 text-[11px] text-slate-400">
-                    <span>
-                      📅{" "}
-                      {new Date(
-                        event.date
-                      ).toLocaleDateString()}{" "}
-                      · {event.time}
-                    </span>
-                    <span>📍 {event.venue}</span>
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center justify-between">
-                  <Link
-                    to={`/events/${event._id}`}
-                    className="text-[11px] text-sky-300 hover:underline"
-                  >
-                    View details
-                  </Link>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="subtle"
-                      className="px-3 py-1 text-[11px]"
-                      onClick={() => handleBookmark(event._id)}
-                      disabled={!user}
-                    >
-                      ☆ Bookmark
-                    </Button>
-                    <Button
-                      className="px-3 py-1 text-[11px]"
-                      onClick={() => handleRegister(event._id)}
-                      disabled={!user}
-                    >
-                      Register
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
-        </motion.div>
-      )}
+      </section>
     </div>
   );
 };
