@@ -2,6 +2,7 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "./components/layout/Navbar";
+import Footer from "./components/layout/Footer";
 import Home from "./pages/Home";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -34,7 +35,7 @@ const App = () => {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-white text-slate-900 flex flex-col">
       {/* Startup preloader overlay (optional) */}
       <Preloader />
 
@@ -42,7 +43,7 @@ const App = () => {
       <Navbar />
 
       {/* Content area centered under navbar */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 py-8 flex-1 w-full">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route
@@ -100,6 +101,9 @@ const App = () => {
           </Routes>
         </AnimatePresence>
       </main>
+
+      {/* Footer always full-width at bottom */}
+      <Footer />
     </div>
   );
 };
