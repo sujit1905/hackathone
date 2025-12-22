@@ -3,63 +3,96 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
-const STORAGE_KEY = "dnica_profile";
-
 const Profile = () => {
   const { user, logout } = useAuth();
 
-  // base profile (used if nothing in localStorage)
-  const baseProfile = {
-    name: user?.name || "",
+  const emailKey = user?.email || "guest";
+  const STORAGE_KEY = `dnica_profile_${emailKey}`;
+
+  const defaultName =
+    user?.name || (user?.email ? user.email.split("@")[0] : "");
+
+  const buildBaseProfile = () => ({
+    name: defaultName,
     gender: "",
     phone: user?.phone || "",
     college: "DNICA",
     degree: "",
     branch: "",
-  };
+  });
 
-  // initialize from localStorage once
+  // 1) INITIAL STATE: read once from localStorage (or use base defaults)
   const [profile, setProfile] = useState(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : baseProfile;
+      if (stored) return JSON.parse(stored);
+      return buildBaseProfile();
     } catch {
-      return baseProfile;
+      return buildBaseProfile();
     }
   });
 
   const [editing, setEditing] = useState(false);
 
-  // keep localStorage in sync whenever profile changes
+  // 2) When user (email) changes, switch to that user's saved profile
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        setProfile(JSON.parse(stored));
+      } else {
+        setProfile(buildBaseProfile());
+      }
+    } catch {
+      setProfile(buildBaseProfile());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [emailKey]);
+
+  // 3) Persist current profile whenever it changes
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
     } catch {
-      // ignore quota / private mode errors
+      // ignore errors
     }
-  }, [profile]);
+  }, [profile, STORAGE_KEY]);
 
   const handleChange = (e) =>
     setProfile((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleSave = (e) => {
     e.preventDefault();
-    setEditing(false);
+    setEditing(false); // profile already saved by effect
   };
 
   const handleCancel = () => {
+    // reload last saved profile for this user
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        setProfile(JSON.parse(stored));
+      } else {
+        setProfile(buildBaseProfile());
+      }
+    } catch {
+      setProfile(buildBaseProfile());
+    }
     setEditing(false);
   };
 
-  // avatar image based on gender (default generic)
-  let avatarSrc = "/images/maleimage.png";
+  // avatar: first letter by default, image after gender choice
+  const showImage = profile.gender === "Male" || profile.gender === "Female";
+  let avatarSrc = "";
   if (profile.gender === "Female") {
     avatarSrc = "/images/femalepro.jpg";
   } else if (profile.gender === "Male") {
     avatarSrc = "/images/maleimage.png";
   }
 
-  // profile completion
+  const firstLetter =
+    (profile.name || user?.name || user?.email || "U").charAt(0).toUpperCase();
+
   const fields = [
     profile.name,
     profile.gender,
@@ -80,11 +113,17 @@ const Profile = () => {
           {/* avatar */}
           <div className="absolute -top-14 left-1/2 -translate-x-1/2">
             <div className="h-28 w-28 rounded-full bg-white shadow-[0_12px_30px_rgba(15,23,42,0.25)] flex items-center justify-center overflow-hidden">
-              <img
-                src={avatarSrc}
-                alt="Profile avatar"
-                className="h-24 w-24 object-cover"
-              />
+              {showImage ? (
+                <img
+                  src={avatarSrc}
+                  alt="Profile avatar"
+                  className="h-24 w-24 object-cover"
+                />
+              ) : (
+                <div className="h-24 w-24 rounded-full bg-gradient-to-br from-[#60a5fa] to-[#1d4ed8] flex items-center justify-center text-4xl font-semibold text-white">
+                  {firstLetter}
+                </div>
+              )}
             </div>
           </div>
 
@@ -342,7 +381,7 @@ const Profile = () => {
                   <button
                     type="button"
                     onClick={handleCancel}
-                    className="px-7 py-2.5 rounded-md bg-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-300"
+                    className="px-7 py-2.5 rounded-md bg-slate-200 text-slate-700 text-sm font-semibold hover:bg-слate-300"
                   >
                     Cancel
                   </button>

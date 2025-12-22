@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import {FaChevronLeft, FaAngleRight} from "react-icons/fa6";
+import { PiBuildingLight } from "react-icons/pi";
+import { PiStudent } from "react-icons/pi";
 
 // Hero images
 const slides = [
@@ -163,8 +165,8 @@ const Home = () => {
   return (
     <div>
       {/* Hero + testimonial */}
-      <section className="rounded-[24px] md:rounded-[32px] bg-[#f3f4f6] px-4 sm:px-6 md:px-8 pt-8 md:pt-10 pb-10 md:pb-16 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
+      <section className="rounded-[24px] md:rounded-[32px] bg-[#f3f4f9] px-4 sm:px-6 md:px-8 pt-8 md:pt-10 pb-10 md:pb-16 shadow-[0_18px_40px_rgba(15,23,42,0.06)] border border-black/10">
+  <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
           {/* Left: hero images */}
           <div className="relative order-1 lg:order-none select-none">
             <div className="rounded-3xl bg-[#f2f3f8] overflow-hidden min-h-[260px] sm:min-h-[320px] lg:min-h-[360px] flex items-center justify-center">
@@ -253,7 +255,7 @@ const Home = () => {
           <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-10">
             <div className="w-full md:w-1/3">
               <div className="rounded-[24px] border border-slate-200 bg-white shadow-sm px-6 py-6 text-center">
-                <div className="mb-3 text-2xl">🎓</div>
+                <div className="mb-3 text-2xl flex justify-center"><PiStudent /></div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-1">
                   Students
                 </h3>
@@ -265,18 +267,18 @@ const Home = () => {
 
             <div className="w-48 h-48 md:w-56 md:h-56 rounded-full border-[6px] border-slate-900 bg-slate-100 flex items-center justify-center text-center px-6">
               <div>
-                <p className="text-xs tracking-[0.18em] uppercase text-slate-500 mb-2">
+                <p className="text-xs tracking-[0.18em] uppercase text-slate-700 mb-1">
                   Who is using
                 </p>
                 <p className="text-xl md:text-2xl font-semibold text-slate-900">
-                  EventApply
+                  DNICA EventHub
                 </p>
               </div>
             </div>
 
             <div className="w-full md:w-1/3">
               <div className="rounded-[24px] border border-slate-200 bg-white shadow-sm px-6 py-6 text-center">
-                <div className="mb-3 text-2xl">🏫</div>
+                <div className="mb-3 text-2xl flex justify-center"><PiBuildingLight /></div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-1">
                   Colleges
                 </h3>
