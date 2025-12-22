@@ -125,7 +125,7 @@ const Login = () => {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
           {/* Email */}
           <div className="space-y-1 text-sm">
             <label className="text-xs text-slate-500">Email</label>
@@ -139,7 +139,8 @@ const Login = () => {
                 value={form.email}
                 onChange={handleChange}
                 className="w-full bg-transparent py-2 text-sm outline-none px-3"
-                placeholder="Enter your email"
+                placeholder="Enter your Email"
+                autoComplete="off"
                 required
               />
             </div>
@@ -158,9 +159,11 @@ const Login = () => {
                 value={form.password}
                 onChange={handleChange}
                 className="w-full bg-transparent py-2 text-sm outline-none px-3"
-                placeholder="Enter password"
+                placeholder="Your password"
+                autoComplete="new-password"
                 required
               />
+
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}

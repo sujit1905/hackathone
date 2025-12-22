@@ -18,6 +18,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Profile from "./pages/Profile";
 
+
 import RouteLoader from "./components/common/RouteLoader";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -44,16 +45,71 @@ const Page = ({ children }) => (
 );
 
 // Lottie preloader using your JSON file
+// Lottie preloader using your JSON file
+// Lottie preloader using your JSON file
+// Lottie preloader using your JSON file
+// Lottie preloader using your JSON file
+// Lottie preloader using your JSON file
 const LottiePreloader = () => (
   <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white">
-    <Lottie
-      path="/animations/SKILLED TEAM.json" // from client/public/animations
-      loop
-      autoplay
-      style={{ width: 140, height: 140 }}
-    />
+    <div className="flex flex-col items-center gap-5">
+      {/* Animated logo text */}
+      <motion.span
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="text-xl lg:text-2xl text-slate-900 font-semibold tracking-tight"
+      >
+        DNICA<span className="text-[#fa8c16]">EventHub</span>
+      </motion.span>
+
+      {/* Tagline */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.85 }}
+        transition={{ delay: 0.4, duration: 0.5 }}
+        className="text-xs sm:text-sm text-slate-500"
+      >
+        Discover India&apos;s best campus events.
+      </motion.p>
+
+      {/* Lottie + glow */}
+      <div className="relative">
+        {/* Soft animated glow behind loader */}
+        <motion.div
+          className="absolute inset-0 rounded-full bg-[#fa8c16]/20 blur-xl"
+          initial={{ opacity: 0.3, scale: 0.9 }}
+          animate={{ opacity: 0.8, scale: 1.05 }}
+          transition={{
+            duration: 1.6,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut",
+          }}
+        />
+        <div className="relative">
+          <Lottie
+            path="/animations/SKILLED TEAM.json"
+            loop
+            autoplay
+            style={{ width: 250, height: 250 }}
+          />
+        </div>
+      </div>
+
+      {/* Loading text with animated dots */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.9 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+        className="text-[11px] sm:text-xs text-slate-400 tracking-[0.18em] uppercase"
+      >
+        Loading experience<span className="animate-pulse">...</span>
+      </motion.p>
+    </div>
   </div>
 );
+
 
 const App = () => {
   const location = useLocation();

@@ -32,3 +32,48 @@ body {
 *::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #3b82f6, #1d4ed8);
 }
+/* Move React-Toastify top-right container down */
+.Toastify__toast-container--top-right {
+  top: 5.3rem !important;  /* adjust this value until it sits under navbar */
+}
+.hero-explore-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shiny sweep looping every 2.5s */
+.hero-explore-btn::before {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -50%;
+  width: 60%;
+  height: 200%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.85) 45%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  transform: translateX(-120%) skewX(-25deg);
+  opacity: 0;
+  animation: hero-shine 2.5s ease-out infinite;
+}
+
+@keyframes hero-shine {
+  0% {
+    transform: translateX(-120%) skewX(-25deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(220%) skewX(-25deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(220%) skewX(-25deg);
+    opacity: 0;
+  }
+}
