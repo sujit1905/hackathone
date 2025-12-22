@@ -17,6 +17,9 @@ import Clubs from "./pages/Clubs";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Events from "./pages/Events";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Profile from "./pages/Profile";
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -42,10 +45,10 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-white text-slate-900 flex flex-col">
-      {/* Startup preloader overlay (optional) */}
+      {/* Startup preloader overlay */}
       <Preloader />
 
-      {/* Navbar always on white */}
+      {/* Navbar */}
       <Navbar />
 
       <ToastContainer
@@ -59,7 +62,7 @@ const App = () => {
         theme="colored"
       />
 
-      {/* Content area centered under navbar */}
+      {/* Content area */}
       <main className="max-w-6xl mx-auto px-4 py-8 flex-1 w-full">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
@@ -100,6 +103,24 @@ const App = () => {
             />
 
             <Route
+              path="/about"
+              element={
+                <Page>
+                  <About />
+                </Page>
+              }
+            />
+
+            <Route
+              path="/contact"
+              element={
+                <Page>
+                  <Contact />
+                </Page>
+              }
+            />
+
+            <Route
               path="/login"
               element={
                 <Page>
@@ -114,6 +135,18 @@ const App = () => {
                 <Page>
                   <Register />
                 </Page>
+              }
+            />
+
+            {/* NEW: profile page after login */}
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Page>
+                    <Profile />
+                  </Page>
+                </ProtectedRoute>
               }
             />
 
@@ -151,7 +184,7 @@ const App = () => {
         </AnimatePresence>
       </main>
 
-      {/* Footer always full-width at bottom */}
+      {/* Footer */}
       <Footer />
     </div>
   );

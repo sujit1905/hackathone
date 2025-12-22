@@ -3,15 +3,16 @@ import React, { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
-import { FaArrowDown } from "react-icons/fa";
 import { CiHeart, CiBellOn } from "react-icons/ci";
 import { toast } from "react-toastify";
+import { FaAngleDown } from "react-icons/fa6";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showMore, setShowMore] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -63,12 +64,49 @@ const Navbar = () => {
         <div className="flex items-center gap-3">
           {/* Desktop actions: only on large screens */}
           <div className="hidden lg:flex items-center gap-3 text-xs relative">
-            <button className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-900 text-[17px]">
-              <span>More</span>
-              <span className="text-xs">
-                <FaArrowDown />
-              </span>
-            </button>
+            {/* More dropdown trigger */}
+            <div className="relative">
+              <button
+                onClick={() => setShowMore((prev) => !prev)}
+                className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-900 text-[17px]"
+              >
+                <span>More</span>
+                <span className="text-xs">
+                  <FaAngleDown
+                    className={`transition-transform ${
+                      showMore ? "rotate-180" : ""
+                    }`}
+                  />
+                </span>
+              </button>
+
+              <AnimatePresence>
+                {showMore && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute left-0 mt-3 w-40 bg-white rounded-xl shadow-[0_16px_40px_rgba(15,23,42,0.16)] border border-slate-100 overflow-hidden z-40"
+                  >
+                    <Link
+                      to="/about"
+                      onClick={() => setShowMore(false)}
+                      className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      About Us
+                    </Link>
+                    <Link
+                      to="/contact"
+                      onClick={() => setShowMore(false)}
+                      className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      Contact Us
+                    </Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* Bell with dropdown */}
             <div className="relative">
@@ -123,7 +161,29 @@ const Navbar = () => {
               <CiHeart />
             </button>
 
-            {!user ? (
+            {/* Profile + auth buttons */}
+            {user ? (
+              <>
+                {/* Profile button like in the design */}
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 bg-white text-[14px] text-slate-700 hover:bg-slate-50"
+                >
+                  <span className="h-7 w-7 rounded-full bg-[#fff7e6] flex items-center justify-center text-[11px] font-semibold text-slate-900">
+                    {user.name?.[0]?.toUpperCase() || "U"}
+                  </span>
+                  <span>Profile</span>
+                </Link>
+
+                <motion.button
+                  whileTap={{ scale: 0.96 }}
+                  onClick={handleLogout}
+                  className="px-5 py-3 rounded-full border border-slate-300 text-[14px] text-slate-700 hover:bg-slate-900 hover:text-white transition"
+                >
+                  Logout
+                </motion.button>
+              </>
+            ) : (
               <>
                 <Link
                   to="/login"
@@ -137,19 +197,6 @@ const Navbar = () => {
                 >
                   Sign up
                 </Link>
-              </>
-            ) : (
-              <>
-                <span className="hidden sm:inline text-[11px] text-slate-500">
-                  {user.name} ({user.role})
-                </span>
-                <motion.button
-                  whileTap={{ scale: 0.96 }}
-                  onClick={handleLogout}
-                  className="px-5 py-3 rounded-full border border-slate-300 text-[14px] text-slate-700 hover:bg-slate-900 hover:text-white transition"
-                >
-                  Logout
-                </motion.button>
               </>
             )}
 
@@ -259,6 +306,39 @@ const Navbar = () => {
                   onClick={() => setOpen(false)}
                 >
                   My Participations
+                </NavLink>
+
+                {/* Profile link on mobile when logged in */}
+                {user && (
+                  <NavLink
+                    to="/profile"
+                    className={({ isActive }) =>
+                      `py-2 border-b ${
+                        isActive
+                          ? "border-slate-900 text-slate-900 font-semibold"
+                          : "border-slate-100 text-slate-600"
+                      }`
+                    }
+                    onClick={() => setOpen(false)}
+                  >
+                    Profile
+                  </NavLink>
+                )}
+
+                {/* More items in mobile */}
+                <NavLink
+                  to="/about"
+                  className="py-2 border-b border-slate-100 text-slate-600"
+                  onClick={() => setOpen(false)}
+                >
+                  About Us
+                </NavLink>
+                <NavLink
+                  to="/contact"
+                  className="py-2 border-b border-slate-100 text-slate-600"
+                  onClick={() => setOpen(false)}
+                >
+                  Contact Us
                 </NavLink>
               </nav>
 

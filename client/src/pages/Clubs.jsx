@@ -10,7 +10,7 @@ const clubs = [
     org: "Unstop",
     city: "Pune",
     type: "limited_company",
-    logo: "/images/clubs/unstopp.png", // change paths to your logos
+    logo: "/images/clubs/unstopp.png",
     eventsCount: 5,
   },
   {
@@ -45,7 +45,9 @@ const Clubs = () => {
       {/* Search bar */}
       <div className="mt-4 mb-6">
         <div className="w-full rounded-full bg-[#f3f4f6] px-6 py-3 flex items-center gap-4 shadow-[0_14px_30px_rgba(15,23,42,0.08)]">
+          {/* Left search icon */}
           <CiSearch className="text-2xl text-slate-500" />
+
           <input
             type="text"
             value={query}
@@ -53,6 +55,8 @@ const Clubs = () => {
             placeholder="Search for club, college"
             className="flex-1 bg-transparent outline-none text-sm sm:text-base text-slate-800"
           />
+
+          {/* Clear button (optional) */}
           {query && (
             <button
               onClick={() => setQuery("")}
@@ -61,9 +65,11 @@ const Clubs = () => {
               ✕
             </button>
           )}
-          <button className="h-10 w-10 flex items-center justify-center rounded-full bg-[#fbbf24] text-slate-900 text-lg">
+
+          {/* REMOVED: yellow search icon button */}
+          {/* <button className="h-10 w-10 flex items-center justify-center rounded-full bg-[#fbbf24] text-slate-900 text-lg">
             <CiSearch />
-          </button>
+          </button> */}
         </div>
 
         <p className="mt-3 text-sm text-slate-500">
