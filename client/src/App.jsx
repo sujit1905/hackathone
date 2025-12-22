@@ -11,6 +11,12 @@ import MyEvents from "./pages/MyEvents";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Preloader from "./components/ui/Preloader";
+import Wishlist from "./pages/Wishlist";
+import Clubs from "./pages/Clubs";
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Events from "./pages/Events";
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -42,6 +48,17 @@ const App = () => {
       {/* Navbar always on white */}
       <Navbar />
 
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="colored"
+      />
+
       {/* Content area centered under navbar */}
       <main className="max-w-6xl mx-auto px-4 py-8 flex-1 w-full">
         <AnimatePresence mode="wait">
@@ -54,22 +71,16 @@ const App = () => {
                 </Page>
               }
             />
+
             <Route
-              path="/login"
+              path="/events"
               element={
                 <Page>
-                  <Login />
+                  <Events />
                 </Page>
               }
             />
-            <Route
-              path="/register"
-              element={
-                <Page>
-                  <Register />
-                </Page>
-              }
-            />
+
             <Route
               path="/events/:id"
               element={
@@ -78,6 +89,34 @@ const App = () => {
                 </Page>
               }
             />
+
+            <Route
+              path="/clubs"
+              element={
+                <Page>
+                  <Clubs />
+                </Page>
+              }
+            />
+
+            <Route
+              path="/login"
+              element={
+                <Page>
+                  <Login />
+                </Page>
+              }
+            />
+
+            <Route
+              path="/register"
+              element={
+                <Page>
+                  <Register />
+                </Page>
+              }
+            />
+
             <Route
               path="/my-events"
               element={
@@ -88,6 +127,7 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
             <Route
               path="/admin"
               element={
@@ -96,6 +136,15 @@ const App = () => {
                     <AdminDashboard />
                   </Page>
                 </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/wishlist"
+              element={
+                <Page>
+                  <Wishlist />
+                </Page>
               }
             />
           </Routes>

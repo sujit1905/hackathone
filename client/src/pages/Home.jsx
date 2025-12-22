@@ -3,13 +3,13 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
+import {FaChevronLeft, FaAngleRight} from "react-icons/fa6";
 
 // Hero images
 const slides = [
-  "/images/engineer-4922413_1280.jpg",
-  "/images/istockphoto-1761638528-1024x1024.jpg",
-  "/images/istockphoto-1909556559-1024x1024.jpg",
-  "/images/istockphoto-2186780950-1024x1024.jpg",
+  "/images/main01.svg",
+  "/images/main032.svg",
+  "/images/main03.svg",
 ];
 
 // Testimonial reviews
@@ -301,13 +301,13 @@ const Home = () => {
               onClick={() => featuredApi && featuredApi.scrollPrev()}
               className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm"
             >
-              ‹
+              <FaChevronLeft />
             </button>
             <button
               onClick={() => featuredApi && featuredApi.scrollNext()}
               className="w-9 h-9 rounded-full bg-[#f7a900] text-white flex items-center justify-center shadow-sm"
             >
-              ›
+              <FaAngleRight />
             </button>
           </div>
         </div>
@@ -366,13 +366,13 @@ const Home = () => {
               onClick={() => recentApi && recentApi.scrollPrev()}
               className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm"
             >
-              ‹
+              <FaChevronLeft />
             </button>
             <button
               onClick={() => recentApi && recentApi.scrollNext()}
               className="w-9 h-9 rounded-full bg-[#f7a900] text-white flex items-center justify-center shadow-sm"
             >
-              ›
+              <FaAngleRight />
             </button>
           </div>
         </div>

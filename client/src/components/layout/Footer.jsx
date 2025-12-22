@@ -1,5 +1,7 @@
 // src/components/layout/Footer.jsx
 import { Link } from "react-router-dom";
+import { FaFacebookF, FaInstagram, FaXTwitter, FaLinkedinIn } from "react-icons/fa6";
+
 
 const Footer = () => {
   return (
@@ -9,14 +11,14 @@ const Footer = () => {
           {/* Logo + tagline (same style as Navbar) */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="flex items-center justify-center h-11 w-11 lg:h-12 lg:w-12 rounded-3xl bg-[#fff7e6] border border-[#ffd591] shadow-sm">
+              {/* <div className="flex items-center justify-center h-11 w-11 lg:h-12 lg:w-12 rounded-3xl bg-[#fff7e6] border border-[#ffd591] shadow-sm">
                 <span className="text-xl lg:text-2xl font-bold text-[#fa8c16] leading-none">
                   C
                 </span>
-              </div>
+              </div> */}
               <span className="text-xl lg:text-2xl text-slate-900">
-                Campus<span className="text-[#fa8c16]">Connect</span>
-              </span>
+            DNICA<span className="text-[#fa8c16]">EventHub</span>
+          </span>
             </div>
             <p className="text-sm text-slate-500 max-w-xs">
               India&apos;s largest college event platform.
@@ -72,16 +74,16 @@ const Footer = () => {
             </h3>
             <div className="flex items-center gap-4 text-slate-600 text-sm">
               <a href="#" className="hover:text-slate-900">
-                Fb
+                <FaFacebookF />
               </a>
               <a href="#" className="hover:text-slate-900">
-                Ig
+                <FaInstagram />
               </a>
               <a href="#" className="hover:text-slate-900">
-                X
+                <FaXTwitter />
               </a>
               <a href="#" className="hover:text-slate-900">
-                In
+                <FaLinkedinIn />
               </a>
             </div>
           </div>
@@ -90,7 +92,7 @@ const Footer = () => {
 
       <div className="border-t border-slate-200 bg-[#e5e7eb]">
         <p className="text-center text-xs sm:text-sm text-slate-500 py-4">
-          © 2025 CampusConnect, All rights reserved.
+          © 2025 DNICAEventHub, All rights reserved.
         </p>
       </div>
     </footer>

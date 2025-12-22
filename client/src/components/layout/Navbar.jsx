@@ -3,14 +3,21 @@ import React, { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
+import { FaArrowDown } from "react-icons/fa";
+import { CiHeart, CiBellOn } from "react-icons/ci";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const handleLogout = () => {
     logout();
+    toast.success("Logged out successfully!", {
+      style: { background: "#16a34a", color: "#fff" },
+    });
     navigate("/login");
     setOpen(false);
   };
@@ -31,13 +38,8 @@ const Navbar = () => {
           to="/"
           className="flex items-center gap-2 font-semibold tracking-tight"
         >
-          <div className="flex items-center justify-center h-11 w-11 lg:h-12 lg:w-12 rounded-3xl bg-[#fff7e6] border border-[#ffd591] shadow-sm">
-            <span className="text-xl lg:text-2xl font-bold text-[#fa8c16] leading-none">
-              C
-            </span>
-          </div>
           <span className="text-xl lg:text-2xl text-slate-900">
-            Campus<span className="text-[#fa8c16]">Connect</span>
+            DNICA<span className="text-[#fa8c16]">EventHub</span>
           </span>
         </Link>
 
@@ -59,20 +61,66 @@ const Navbar = () => {
 
         {/* Right side */}
         <div className="flex items-center gap-3">
-          {/* Bell always visible */}
-          <button className="flex h-9 w-9 items-center justify-center rounded-full bg-[#f0f5ff] text-[#2f54eb] text-sm">
-            🔔
-          </button>
-
           {/* Desktop actions: only on large screens */}
-          <div className="hidden lg:flex items-center gap-3 text-xs">
+          <div className="hidden lg:flex items-center gap-3 text-xs relative">
             <button className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-900 text-[17px]">
               <span>More</span>
-              <span>▾</span>
+              <span className="text-xs">
+                <FaArrowDown />
+              </span>
             </button>
 
-            <button className="h-10 w-10 items-center justify-center rounded-full bg-[#fff1f0] text-[#fa541c] text-sm">
-              ❤
+            {/* Bell with dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications((prev) => !prev)}
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#f0f5ff] text-[#2f54eb] text-xl"
+              >
+                <CiBellOn />
+              </button>
+
+              <AnimatePresence>
+                {showNotifications && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 mt-3 w-72 bg-white rounded-xl shadow-[0_18px_40px_rgba(15,23,42,0.16)] border border-slate-100 overflow-hidden z-50"
+                  >
+                    <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/60">
+                      <p className="text-sm font-semibold text-slate-800">
+                        Notifications
+                      </p>
+                    </div>
+                    <div className="px-4 py-6 text-center">
+                      <div className="mb-3 text-3xl text-slate-300 flex justify-center">
+                        <CiBellOn />
+                      </div>
+                      <p className="text-sm font-medium text-slate-700">
+                        No new notifications
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        We&apos;ll notify you when there&apos;s something new.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setShowNotifications(false)}
+                      className="w-full py-2.5 text-sm text-slate-600 border-t border-slate-100 hover:bg-slate-50"
+                    >
+                      Close
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Wishlist heart */}
+            <button
+              onClick={() => navigate("/wishlist")}
+              className="h-10 w-10 flex items-center justify-center rounded-full bg-[#fff1f0] text-[#fa541c] text-xl"
+            >
+              <CiHeart />
             </button>
 
             {!user ? (

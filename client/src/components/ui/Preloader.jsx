@@ -25,11 +25,11 @@ const Preloader = () => {
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-3xl bg-[#fff7e6] border border-[#ffd591] shadow-sm">
                 <span className="text-2xl font-bold text-[#fa8c16] leading-none">
-                  C
+                  DE
                 </span>
               </div>
               <span className="text-2xl font-semibold text-slate-900">
-                Campus<span className="text-[#fa8c16]">Connect</span>
+                DNICA<span className="text-[#fa8c16]">Eventhub</span>
               </span>
             </div>
 
