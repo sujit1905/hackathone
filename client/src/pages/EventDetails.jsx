@@ -3,8 +3,11 @@ import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { MdDateRange, MdOutlineLocationOn } from "react-icons/md";
 import { HiOutlineTrophy, HiMiniTrophy } from "react-icons/hi2";
-import { FaRegIdCard } from "react-icons/fa";
-
+import { FaRegIdCard} from "react-icons/fa";
+import { CiSquareInfo } from "react-icons/ci";
+import { FaBullseye } from "react-icons/fa";
+import { IoTrophyOutline } from "react-icons/io5";
+import { IoIosTimer } from "react-icons/io";
 // TEMP: mock data – later you can fetch by id from API
 const mockEvents = {
   1: {
@@ -125,8 +128,8 @@ const EventDetails = () => {
 
           <div className="flex flex-wrap gap-3 mt-2">
             <button className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#0ea5e9] text-sm font-semibold shadow-md hover:bg-[#0284c7]">
-              <FaRegIdCard className="w-4 h-4" />
-              <span>Register on organizer&apos;s website</span>
+              <FaRegIdCard className="h-5 w-5"/>
+              <span>Register</span>
             </button>
 
             <button className="inline-flex items-center justify-center px-4 py-2.5 rounded-full bg-white/90 text-slate-800 text-sm font-semibold">
@@ -150,7 +153,7 @@ const EventDetails = () => {
                   : "bg-transparent text-white"
               }`}
             >
-              <span>ⓘ</span>
+              <span><CiSquareInfo size={15}/></span>
               <span>Overview</span>
             </button>
 
@@ -162,7 +165,7 @@ const EventDetails = () => {
                   : "bg-transparent text-white"
               }`}
             >
-              <span>◎</span>
+              <span><FaBullseye size={15}/></span>
               <span>Event Stages</span>
             </button>
 
@@ -174,7 +177,7 @@ const EventDetails = () => {
                   : "bg-transparent text-white"
               }`}
             >
-              <HiOutlineTrophy className="w-4 h-4" />
+              <IoTrophyOutline size={15}/>
               <span>Prizes &amp; Rewards</span>
             </button>
 
@@ -186,7 +189,7 @@ const EventDetails = () => {
                   : "bg-transparent text-white"
               }`}
             >
-              <MdDateRange className="w-4 h-4" />
+              <IoIosTimer size={15}/>
               <span>Timeline</span>
             </button>
           </div>

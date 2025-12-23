@@ -44,7 +44,7 @@ const Clubs = () => {
     <div className="pb-12">
       {/* Search bar */}
       <div className="mt-4 mb-6">
-        <div className="w-full rounded-full bg-[#f3f4f6] px-6 py-3 flex items-center gap-4 shadow-[0_14px_30px_rgba(15,23,42,0.08)]">
+        <div className="w-full rounded-full bg-[#f3f4f6] px-6 py-3 flex items-center gap-4">
           {/* Left search icon */}
           <CiSearch className="text-2xl text-slate-500" />
 

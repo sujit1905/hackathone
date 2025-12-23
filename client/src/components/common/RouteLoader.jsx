@@ -19,7 +19,7 @@ const RouteLoader = ({ children }) => {
   return (
     <>
       {loading && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-white/60 backdrop-blur-[1px]">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center">
           <div className="flex items-end gap-[4px]">
             {/* 5 bars with different base heights + stagger delay */}
             <span className="w-[3px] h-6 bg-slate-800 origin-bottom animate-equalize [animation-delay:0s]" />

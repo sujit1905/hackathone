@@ -34,8 +34,6 @@ const Register = () => {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleRoleChange = (role) => setForm((prev) => ({ ...prev, role }));
-
   const handleGoogleRegister = async () => {
     setError("");
     setLoading(true);
@@ -82,7 +80,7 @@ const Register = () => {
         email: form.email,
         phone: form.phone,
         password: form.password,
-        role: form.role,
+        role: "student",
       });
       login(data);
       toast.success("Account created successfully!", {
@@ -105,44 +103,16 @@ const Register = () => {
             Join DNICA EventHub
           </h2>
           <p className="text-xs sm:text-sm text-orange-50">
-            Create your account and start exploring college events and clubs.
+            Create your student account and start exploring college events and clubs.
           </p>
         </div>
 
         {/* Heading */}
-        <div className="mb-4 text-center">
-          <h3 className="text-lg font-semibold text-slate-900">Sign Up</h3>
+        <div className="mb-6 text-center">
+          <h3 className="text-lg font-semibold text-slate-900">Sign Up as Student</h3>
           <p className="text-xs text-slate-500">
-            Choose your role and fill in your basic details.
+            Fill in your details to create your student account.
           </p>
-        </div>
-
-        {/* Role tabs */}
-        <div className="flex mb-4 text-sm">
-          <button
-            type="button"
-            onClick={() => handleRoleChange("student")}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-l-md border ${
-              form.role === "student"
-                ? "bg-[#f97316]/10 border-[#f97316] text-[#f97316] font-medium"
-                : "bg-slate-50 border-slate-200 text-slate-500"
-            }`}
-          >
-            <span>🎓</span>
-            <span>Student</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleRoleChange("admin")}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-r-md border-t border-r border-b ${
-              form.role === "admin"
-                ? "bg-[#f97316]/10 border-[#f97316] text-[#f97316] font-medium"
-                : "bg-slate-50 border-slate-200 text-slate-500"
-            }`}
-          >
-            <span>🏫</span>
-            <span>Club</span>
-          </button>
         </div>
 
         {/* Google button */}
@@ -285,9 +255,7 @@ const Register = () => {
           >
             {loading
               ? "Creating your account..."
-              : form.role === "student"
-              ? "CREATE STUDENT ACCOUNT"
-              : "CREATE CLUB ACCOUNT"}
+              : "CREATE STUDENT ACCOUNT"}
           </Button>
         </form>
 

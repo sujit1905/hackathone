@@ -9,6 +9,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { motion } from "framer-motion";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
+import { FaChevronLeft, FaAngleRight } from "react-icons/fa6";
 
 const featuredEvents = [
   {
@@ -167,7 +168,7 @@ const Events = () => {
     <div className="pb-12">
       {/* Search bar + suggestions */}
       <div className="mt-4 mb-8 relative">
-        <div className="w-full rounded-full bg-[#f3f4f6] px-6 py-3 flex items-center gap-4 shadow-[0_14px_30px_rgba(15,23,42,0.08)]">
+        <div className="w-full rounded-full bg-[#f3f4f6] px-6 py-3 flex items-center gap-4 border">
           <CiSearch className="text-2xl text-slate-500" />
           <input
             type="text"
@@ -223,13 +224,13 @@ const Events = () => {
               onClick={() => emblaApi && emblaApi.scrollPrev()}
               className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm"
             >
-              ‹
+              <FaChevronLeft />
             </button>
             <button
               onClick={() => emblaApi && emblaApi.scrollNext()}
               className="w-9 h-9 rounded-full bg-[#f7a900] text-white flex items-center justify-center shadow-sm"
             >
-              ›
+              <FaAngleRight />
             </button>
           </div>
         </div>

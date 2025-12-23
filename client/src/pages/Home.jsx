@@ -166,10 +166,10 @@ const Home = () => {
   return (
     <div className="space-y-12 md:space-y-16">
       {/* Hero + testimonial */}
-      <section className="rounded-[24px] md:rounded-[32px] bg-gradient-to-br from-slate-50 via-[#f3f4f9] to-slate-50 px-4 sm:px-6 md:px-8 pt-8 md:pt-10 pb-10 md:pb-16 shadow-[0_18px_40px_rgba(15,23,42,0.06)] border border-slate-200/70 overflow-hidden relative">
+      <section className="rounded-[24px] md:rounded-[32px] bg-[#e0f2ff] px-4 sm:px-6 md:px-8 pt-8 md:pt-10 pb-10 md:pb-16 shadow-[0_18px_40px_rgba(15,23,42,0.06)] border border-slate-200/70 overflow-hidden relative">
         {/* subtle background blob */}
-        <div className="pointer-events-none absolute -right-32 -top-32 h-72 w-72 rounded-full bg-[#facc15]/20 blur-3xl" />
-        <div className="pointer-events-none absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-[#6366f1]/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-32 -top-32 h-72 w-72 rounded-full bg-[#facc15]/25 blur-3xl" />
+        <div className="pointer-events-none absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-[#6366f1]/20 blur-3xl" />
 
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-center relative">
           {/* Left: hero images */}
@@ -179,7 +179,7 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            <div className="rounded-3xl bg-[#f2f3f8] overflow-hidden min-h-[260px] sm:min-h-[320px] lg:min-h-[360px] flex items-center justify-center border border-slate-200/70">
+            <div className="rounded-3xl bg-white/70 overflow-hidden min-h-[260px] sm:min-h-[320px] lg:min-h-[360px] flex items-center justify-center border border-slate-200/70 backdrop-blur">
               <img
                 src={slides[heroIndex]}
                 alt="Campus events illustration"
@@ -221,13 +221,12 @@ const Home = () => {
               events, <span className="text-[#f7a900]">all</span> in one place
             </h1>
 
-            <p className="text-sm md:text-base text-slate-500 max-w-xl mx-auto lg:mx-0">
+            <p className="text-sm md:text-base text-slate-600 max-w-xl mx-auto lg:mx-0">
               Explore events from the most vibrant and creative colleges, ready
               to inspire and engage your next experience.
             </p>
 
             <div className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4">
-              {/* Explore: just a button with shine animation class */}
               <button
                 type="button"
                 className="hero-explore-btn flex items-center gap-2 px-6 sm:px-7 py-2.5 sm:py-3 rounded-full bg-[#111827] text-white text-sm sm:text-base font-semibold shadow-md hover:bg-slate-900 transition"
@@ -236,7 +235,6 @@ const Home = () => {
                 <PiArrowFatLineRightBold />
               </button>
 
-              {/* Navigation buttons */}
               <Link
                 to="/events"
                 className="flex items-center gap-2 px-6 sm:px-7 py-2.5 rounded-full bg-white text-slate-800 text-sm sm:text-base font-semibold shadow-sm border border-slate-200 hover:bg-slate-50 transition"
