@@ -40,7 +40,7 @@ const Navbar = () => {
           className="flex items-center gap-2 font-semibold tracking-tight"
         >
           <span className="text-xl lg:text-2xl text-slate-900">
-            DNICA<span className="text-[#fa8c16]">EventHub</span>
+            CLG<span className="text-[#fa8c16]">EventHub</span>
           </span>
         </Link>
 
@@ -51,9 +51,6 @@ const Navbar = () => {
           </NavLink>
           <NavLink to="/events" className={navLinkClass}>
             Events
-          </NavLink>
-          <NavLink to="/clubs" className={navLinkClass}>
-            Clubs
           </NavLink>
           <NavLink to="/my-events" className={navLinkClass}>
             My Participations
@@ -139,7 +136,7 @@ const Navbar = () => {
                         No new notifications
                       </p>
                       <p className="text-xs text-slate-400 mt-1">
-                        We&apos;ll notify you when there&apos;s something new.
+                        We'll notify you when there's something new.
                       </p>
                     </div>
                     <button
@@ -164,7 +161,7 @@ const Navbar = () => {
             {/* Profile + auth buttons */}
             {user ? (
               <>
-                {/* Profile button like in the design */}
+                {/* Profile button */}
                 <Link
                   to="/profile"
                   className="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 bg-white text-[14px] text-slate-700 hover:bg-slate-50"
@@ -174,6 +171,16 @@ const Navbar = () => {
                   </span>
                   <span>Profile</span>
                 </Link>
+
+                {/* ADMIN PANEL BUTTON - VISIBLE ONLY FOR ADMIN */}
+                {user.role === "admin" && (
+                  <Link
+                    to="/admin"
+                    className="px-5 py-3 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-[14px] shadow-lg hover:shadow-xl transition-all"
+                  >
+                    👑 Admin
+                  </Link>
+                )}
 
                 <motion.button
                   whileTap={{ scale: 0.96 }}
@@ -199,13 +206,6 @@ const Navbar = () => {
                 </Link>
               </>
             )}
-
-            <Link
-              to={user?.role === "admin" ? "/admin" : "/login"}
-              className="px-5 py-3 rounded-full bg-[#52c41a] text-white font-medium hover:bg-[#389e0d] transition text-[14px]"
-            >
-              + Host Event
-            </Link>
           </div>
 
           {/* Mobile menu button: visible below lg */}
@@ -282,19 +282,6 @@ const Navbar = () => {
                   Events
                 </NavLink>
                 <NavLink
-                  to="/clubs"
-                  className={({ isActive }) =>
-                    `py-2 border-b ${
-                      isActive
-                        ? "border-slate-900 text-slate-900 font-semibold"
-                        : "border-slate-100 text-slate-600"
-                    }`
-                  }
-                  onClick={() => setOpen(false)}
-                >
-                  Clubs
-                </NavLink>
-                <NavLink
                   to="/my-events"
                   className={({ isActive }) =>
                     `py-2 border-b ${
@@ -322,6 +309,17 @@ const Navbar = () => {
                     onClick={() => setOpen(false)}
                   >
                     Profile
+                  </NavLink>
+                )}
+
+                {/* ADMIN LINK IN MOBILE MENU */}
+                {user?.role === "admin" && (
+                  <NavLink
+                    to="/admin"
+                    className="py-2 border-b border-slate-100 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-xl px-4 py-3 text-center shadow-lg"
+                    onClick={() => setOpen(false)}
+                  >
+                    👑 Admin Panel
                   </NavLink>
                 )}
 
@@ -375,14 +373,6 @@ const Navbar = () => {
                     </motion.button>
                   </>
                 )}
-
-                <Link
-                  to={user?.role === "admin" ? "/admin" : "/login"}
-                  onClick={() => setOpen(false)}
-                  className="w-full text-center px-4 py-2.5 rounded-full bg-[#52c41a] text-white font-medium hover:bg-[#389e0d] transition text-sm"
-                >
-                  + Host Event
-                </Link>
               </div>
             </motion.div>
           </motion.div>

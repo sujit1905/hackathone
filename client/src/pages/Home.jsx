@@ -33,58 +33,18 @@ const reviews = [
 
 // Featured events
 const featuredEvents = [
-  {
-    id: 1,
-    title: "Aditya Birla Group Engenuity 2025",
-    image: "/images/events01.png",
-    cta: "Visit",
-  },
-  {
-    id: 2,
-    title: "Tata Imagination Challenge 2025",
-    image: "/images/events02.png",
-    cta: "Visit",
-  },
-  {
-    id: 3,
-    title: "TCS NQT Foundation Round",
-    image: "/images/events03.png",
-    cta: "Visit",
-  },
-  {
-    id: 4,
-    title: "Hackverse National Hackathon",
-    image: "/images/events04.png",
-    cta: "Visit",
-  },
+  { id: 1, title: "Aditya Birla Group Engenuity 2025", image: "/images/events01.png", cta: "Visit" },
+  { id: 2, title: "Tata Imagination Challenge 2025", image: "/images/events02.png", cta: "Visit" },
+  { id: 3, title: "TCS NQT Foundation Round", image: "/images/events03.png", cta: "Visit" },
+  { id: 4, title: "Hackverse National Hackathon", image: "/images/events04.png", cta: "Visit" },
 ];
 
 // Recently added
 const recentEvents = [
-  {
-    id: 1,
-    title: "Campus Design Sprint",
-    image: "/images/events01.png",
-    cta: "View",
-  },
-  {
-    id: 2,
-    title: "National Robotics League",
-    image: "/images/events02.png",
-    cta: "View",
-  },
-  {
-    id: 3,
-    title: "Cultural Night Fest 2025",
-    image: "/images/events03.png",
-    cta: "View",
-  },
-  {
-    id: 4,
-    title: "AI & ML Bootcamp",
-    image: "/images/events04.png",
-    cta: "View",
-  },
+  { id: 1, title: "Campus Design Sprint", image: "/images/events01.png", cta: "View" },
+  { id: 2, title: "National Robotics League", image: "/images/events02.png", cta: "View" },
+  { id: 3, title: "Cultural Night Fest 2025", image: "/images/events03.png", cta: "View" },
+  { id: 4, title: "AI & ML Bootcamp", image: "/images/events04.png", cta: "View" },
 ];
 
 const Home = () => {
@@ -116,11 +76,11 @@ const Home = () => {
     return () => clearInterval(id);
   }, []);
 
-  // Review slider
+  // Review slider (slower)
   useEffect(() => {
     const id = setInterval(
       () => setReviewIndex((prev) => (prev + 1) % reviews.length),
-      2200
+      4000
     );
     return () => clearInterval(id);
   }, []);
@@ -156,7 +116,7 @@ const Home = () => {
       setRecentSelected(recentApi.selectedScrollSnap());
     };
 
-    recentApi.on("select", onSelect);
+    recentApi.on("select", onInit);
     recentApi.on("reInit", onInit);
     onInit();
   }, [recentApi]);
@@ -252,13 +212,31 @@ const Home = () => {
               </Link>
             </div>
 
-            <div className="mt-4 rounded-3xl bg-white border border-slate-200 shadow-sm px-4 sm:px-6 py-3.5 sm:py-4 text-xs sm:text-sm text-slate-500 max-w-md mx-auto lg:mx-0">
-              <p className="mb-1 line-clamp-3">
-                "{reviews[reviewIndex].text}"
-              </p>
-              <p className="text-sm sm:text-base font-semibold text-center text-[#6366f1]">
-                {reviews[reviewIndex].author}
-              </p>
+            {/* Review slider – same UI, fixed height + animation */}
+            <div className="mt-4 rounded-3xl bg-white border border-slate-200 shadow-sm px-4 sm:px-6 py-3.5 sm:py-4 text-xs sm:text-sm text-slate-500 max-w-md mx-auto lg:mx-0 relative overflow-hidden min-h-[110px] sm:min-h-[118px]">
+              {reviews.map((review, i) => {
+                const isActive = i === reviewIndex;
+                return (
+                  <motion.div
+                    key={i}
+                    className="absolute inset-0 flex flex-col justify-center"
+                    initial={false}
+                    animate={{
+                      opacity: isActive ? 1 : 0,
+                      y: isActive ? 0 : 16,
+                    }}
+                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                    style={{ pointerEvents: isActive ? "auto" : "none" }}
+                  >
+                    <p className="mb-2 leading-relaxed px-7">
+                      "{review.text}"
+                    </p>
+                    <p className="text-sm sm:text-base font-semibold text-center text-[#6366f1]">
+                      {review.author}
+                    </p>
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         </div>
@@ -300,7 +278,7 @@ const Home = () => {
                   Who is using
                 </p>
                 <p className="text-xl md:text-2xl font-semibold text-slate-900">
-                  DNICA EventHub
+                  CLG EventHub
                 </p>
               </div>
             </motion.div>

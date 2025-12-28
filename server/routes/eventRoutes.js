@@ -1,31 +1,26 @@
 import express from "express";
+import { protect, adminOnly } from "../middleware/authMiddleware.js";
 import {
-  createEvent,
   getEvents,
   getEventById,
+  createEvent,
   updateEvent,
   deleteEvent,
-  bookmarkEvent,
-  registerForEvent,
-  getUserEvents,
-  adminStats,
+  registerForEvent
 } from "../controllers/eventController.js";
-import { protect, adminOnly } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.route("/").get(getEvents).post(protect, adminOnly, createEvent);
+// Public routes
+router.get("/", getEvents);
+router.get("/:id", getEventById);
 
-router.get("/user/me", protect, getUserEvents);
-router.get("/admin/stats", protect, adminOnly, adminStats);
+// Protected routes
+router.post("/register/:id", protect, registerForEvent);
 
-router
-  .route("/:id")
-  .get(getEventById)
-  .put(protect, adminOnly, updateEvent)
-  .delete(protect, adminOnly, deleteEvent);
-
-router.post("/:id/bookmark", protect, bookmarkEvent);
-router.post("/:id/register", protect, registerForEvent);
+// Admin only routes
+router.post("/", protect, adminOnly, createEvent);
+router.put("/:id", protect, adminOnly, updateEvent);
+router.delete("/:id", protect, adminOnly, deleteEvent);
 
 export default router;

@@ -10,7 +10,9 @@ import Autoplay from "embla-carousel-autoplay";
 import { motion } from "framer-motion";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { FaChevronLeft, FaAngleRight } from "react-icons/fa6";
+import { useAuth } from "../context/AuthContext";
 
+// FEATURED / STATIC EVENTS (public)
 const featuredEvents = [
   {
     id: 1,
@@ -78,7 +80,8 @@ const featuredEvents = [
   },
 ];
 
-// reuse for “All Events” section
+// For now allEvents uses the same static list.
+// When you connect to backend, you can swap this with data from API for logged-in users.
 const allEvents = featuredEvents;
 
 const listVariants = {
@@ -95,6 +98,7 @@ const cardVariants = {
 };
 
 const Events = () => {
+  const { user } = useAuth();
   const [query, setQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const navigate = useNavigate();
@@ -107,7 +111,12 @@ const Events = () => {
   });
   const [showFilterPanel, setShowFilterPanel] = useState(false);
 
-  // Embla for featured carousel
+  // per-select open state
+  const [isModeOpen, setIsModeOpen] = useState(false);
+  const [isStatusOpen, setIsStatusOpen] = useState(false);
+  const [isFeeOpen, setIsFeeOpen] = useState(false);
+
+  // Embla carousel
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: "start" },
     [Autoplay({ delay: 4000, stopOnInteraction: false })]
@@ -115,7 +124,6 @@ const Events = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [snapPoints, setSnapPoints] = useState([]);
 
-  // All-events filtered list (search + filters)
   const filteredAll = allEvents.filter((e) => {
     const matchQuery = e.title.toLowerCase().includes(query.toLowerCase());
     const matchMode = filters.mode === "all" ? true : e.mode === filters.mode;
@@ -126,7 +134,6 @@ const Events = () => {
     return matchQuery && matchMode && matchStatus && matchFee;
   });
 
-  // Suggestions list for dropdown (from all events)
   const suggestions = allEvents.filter((e) =>
     query.trim() ? e.title.toLowerCase().includes(query.toLowerCase()) : false
   );
@@ -194,7 +201,6 @@ const Events = () => {
           )}
         </div>
 
-        {/* Suggestions dropdown */}
         {showSuggestions && suggestions.length > 0 && (
           <div className="absolute left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_18px_40px_rgba(15,23,42,0.16)] border border-slate-200 max-h-72 overflow-y-auto z-30">
             {suggestions.map((ev) => (
@@ -212,7 +218,7 @@ const Events = () => {
         )}
       </div>
 
-      {/* Featured section (carousel) */}
+      {/* Featured section (always visible) */}
       <section className="mb-10">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl md:text-3xl font-semibold text-slate-900">
@@ -274,7 +280,6 @@ const Events = () => {
               </div>
             </div>
 
-            {/* Dots */}
             <div className="flex justify-center mt-3 gap-2">
               {snapPoints.map((_, i) => (
                 <button
@@ -290,103 +295,161 @@ const Events = () => {
         )}
       </section>
 
-      {/* All events header + filters bar */}
+      {/* All events / gated section */}
       <section className="mt-6">
         <div className="flex items-center justify-between mb-4 gap-4">
           <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">
             <span className="border-b-4 border-[#f7a900] pb-1">All</span> Events
           </h2>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={clearFilters}
-              className="px-4 py-2 rounded-full bg-slate-700 text-white text-xs sm:text-sm font-medium shadow-sm hover:bg-slate-800 transition"
-            >
-              Clear Filters
-            </button>
-
-            <div className="relative">
+          {/* Show filters only when logged in */}
+          {user && (
+            <div className="flex items-center gap-3">
               <button
-                onClick={() => setShowFilterPanel((prev) => !prev)}
-                className="flex items-center gap-1 px-4 py-2 rounded-full border border-slate-300 bg-white text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+                onClick={clearFilters}
+                className="px-4 py-2 rounded-full bg-slate-700 text-white text-xs sm:text-sm font-medium shadow-sm hover:bg-slate-800 transition"
               >
-                Filter
-                <span
-                  className={`text-[10px] transition-transform duration-200 ${
-                    showFilterPanel ? "rotate-180" : "rotate-0"
-                  }`}
-                >
-                  <MdOutlineKeyboardArrowDown className="text-xl" />
-                </span>
+                Clear Filters
               </button>
 
-              {showFilterPanel && (
-                <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-[0_18px_40px_rgba(15,23,42,0.16)] border border-slate-200 z-30 p-4 space-y-3 text-sm">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">
-                      Event Mode
-                    </label>
-                    <select
-                      value={filters.mode}
-                      onChange={(e) =>
-                        setFilters((f) => ({ ...f, mode: e.target.value }))
-                      }
-                      className="w-full border border-slate-200 rounded-md px-2 py-1.5 text-sm text-slate-700 bg-white"
-                    >
-                      <option value="all">All</option>
-                      <option value="online">Online</option>
-                      <option value="offline">Onsite</option>
-                    </select>
-                  </div>
+              <div className="relative">
+                <button
+                  onClick={() => setShowFilterPanel((prev) => !prev)}
+                  className="flex items-center gap-1 px-4 py-2 rounded-full border border-slate-300 bg-white text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+                >
+                  Filter
+                  <span className="text-[10px]">
+                    <MdOutlineKeyboardArrowDown
+                      className={`text-xl transition-transform duration-200 ${
+                        showFilterPanel ? "rotate-180" : "rotate-0"
+                      }`}
+                    />
+                  </span>
+                </button>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">
-                      Registration Status
-                    </label>
-                    <select
-                      value={filters.status}
-                      onChange={(e) =>
-                        setFilters((f) => ({ ...f, status: e.target.value }))
-                      }
-                      className="w-full border border-slate-200 rounded-md px-2 py-1.5 text-sm text-slate-700 bg-white"
-                    >
-                      <option value="all">All</option>
-                      <option value="open">Open</option>
-                      <option value="closed">Closed</option>
-                    </select>
-                  </div>
+                {showFilterPanel && (
+                  <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-[0_18px_40px_rgba(15,23,42,0.16)] border border-slate-200 z-30 p-4 space-y-3 text-sm">
+                    {/* Event Mode */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-600 mb-1">
+                        Event Mode
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={filters.mode}
+                          onChange={(e) => {
+                            setFilters((f) => ({ ...f, mode: e.target.value }));
+                            setIsModeOpen(false);
+                            e.target.blur();
+                          }}
+                          onFocus={() => setIsModeOpen(true)}
+                          onBlur={() => setIsModeOpen(false)}
+                          className="w-full border border-slate-200 rounded-md px-2 py-1.5 pr-7 text-sm text-slate-700 bg-white appearance-none"
+                        >
+                          <option value="all">All</option>
+                          <option value="online">Online</option>
+                          <option value="offline">Onsite</option>
+                        </select>
+                        <MdOutlineKeyboardArrowDown
+                          className={`pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-base text-slate-500 transition-transform duration-200 ${
+                            isModeOpen ? "rotate-180" : "rotate-0"
+                          }`}
+                        />
+                      </div>
+                    </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">
-                      Fee
-                    </label>
-                    <select
-                      value={filters.fee}
-                      onChange={(e) =>
-                        setFilters((f) => ({ ...f, fee: e.target.value }))
-                      }
-                      className="w-full border border-slate-200 rounded-md px-2 py-1.5 text-sm text-slate-700 bg-white"
-                    >
-                      <option value="all">All</option>
-                      <option value="free">Free</option>
-                      <option value="paid">Paid</option>
-                    </select>
-                  </div>
+                    {/* Registration Status */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-600 mb-1">
+                        Registration Status
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={filters.status}
+                          onChange={(e) => {
+                            setFilters((f) => ({
+                              ...f,
+                              status: e.target.value,
+                            }));
+                            setIsStatusOpen(false);
+                            e.target.blur();
+                          }}
+                          onFocus={() => setIsStatusOpen(true)}
+                          onBlur={() => setIsStatusOpen(false)}
+                          className="w-full border border-slate-200 rounded-md px-2 py-1.5 pr-7 text-sm text-slate-700 bg-white appearance-none"
+                        >
+                          <option value="all">All</option>
+                          <option value="open">Open</option>
+                          <option value="closed">Closed</option>
+                        </select>
+                        <MdOutlineKeyboardArrowDown
+                          className={`pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-base text-slate-500 transition-transform duration-200 ${
+                            isStatusOpen ? "rotate-180" : "rotate-0"
+                          }`}
+                        />
+                      </div>
+                    </div>
 
-                  <button
-                    onClick={applyFilters}
-                    className="w-full mt-1 rounded-full bg-[#f59e0b] text-white text-xs sm:text-sm font-semibold py-2 hover:bg-[#f97316] transition"
-                  >
-                    Apply Filters
-                  </button>
-                </div>
-              )}
+                    {/* Fee */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-600 mb-1">
+                        Fee
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={filters.fee}
+                          onChange={(e) => {
+                            setFilters((f) => ({ ...f, fee: e.target.value }));
+                            setIsFeeOpen(false);
+                            e.target.blur();
+                          }}
+                          onFocus={() => setIsFeeOpen(true)}
+                          onBlur={() => setIsFeeOpen(false)}
+                          className="w-full border border-slate-200 rounded-md px-2 py-1.5 pr-7 text-sm text-slate-700 bg-white appearance-none"
+                        >
+                          <option value="all">All</option>
+                          <option value="free">Free</option>
+                          <option value="paid">Paid</option>
+                        </select>
+                        <MdOutlineKeyboardArrowDown
+                          className={`pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-base text-slate-500 transition-transform duration-200 ${
+                            isFeeOpen ? "rotate-180" : "rotate-0"
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={applyFilters}
+                      className="w-full mt-1 rounded-full bg-[#f59e0b] text-white text-xs sm:text-sm font-semibold py-2 hover:bg-[#f97316] transition"
+                    >
+                      Apply Filters
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* All events grid with rich cards */}
-        {filteredAll.length === 0 ? (
+        {/* If not logged in, show prompt instead of all events */}
+        {!user ? (
+          <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center">
+            <p className="text-base sm:text-lg font-semibold text-slate-800 mb-2">
+              Log in to explore all events
+            </p>
+            <p className="text-sm text-slate-500 mb-4">
+              You can see a few featured events above. Sign in to unlock the full list,
+              filters, and registrations.
+            </p>
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition"
+            >
+              Log in
+            </Link>
+          </div>
+        ) : filteredAll.length === 0 ? (
           <p className="text-sm text-slate-500">
             No events found for the selected filters.
           </p>
@@ -403,7 +466,6 @@ const Events = () => {
                 key={event.id}
                 className="bg-white rounded-2xl border border-slate-200 shadow-sm px-4 pt-4 pb-3 flex flex-col justify-between"
               >
-                {/* top meta row */}
                 <div className="flex items-center justify-between mb-2 text-[11px] text-slate-400">
                   <span>↗ Reach {event.reach}</span>
                   <div className="flex items-center gap-2">
@@ -422,7 +484,6 @@ const Events = () => {
                   </div>
                 </div>
 
-                {/* title + org */}
                 <div className="mb-3">
                   <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1">
                     {event.title}
@@ -431,7 +492,6 @@ const Events = () => {
                   <p className="text-[11px] text-slate-400">{event.orgSub}</p>
                 </div>
 
-                {/* info rows */}
                 <div className="space-y-1.5 text-xs sm:text-[13px] mb-4">
                   <div className="flex items-center gap-2">
                     <span className="text-amber-500 text-sm">●</span>
@@ -462,7 +522,6 @@ const Events = () => {
                   </div>
                 </div>
 
-                {/* buttons row */}
                 <div className="mt-auto flex items-center justify-between gap-3">
                   <Link
                     to={`/events/${event.id}`}
@@ -482,7 +541,6 @@ const Events = () => {
                   </span>
                 </div>
 
-                {/* registration dates */}
                 <div className="mt-3 border-t border-slate-100 pt-2 text-[11px] leading-snug">
                   <p className="text-slate-400">
                     Registration Opens: {event.regOpens}

@@ -4,8 +4,11 @@ import { motion } from "framer-motion";
 import api from "../api/axios";
 import Card from "../components/ui/Card";
 import Skeleton from "../components/ui/Skeleton";
+import { useAuth } from "../context/AuthContext";
 
 const MyEvents = () => {
+  const { user } = useAuth();
+
   const [data, setData] = useState({
     bookmarked: [],
     registered: [],
@@ -27,17 +30,39 @@ const MyEvents = () => {
   };
 
   useEffect(() => {
-    fetchMyEvents();
-  }, []);
+    // Only fetch if user is logged in
+    if (user) {
+      fetchMyEvents();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
 
   const current =
     activeTab === "registered" ? data.registered : data.bookmarked;
 
   const showEmpty = !loading && current.length === 0;
 
+  // If not logged in, show message instead of login form
+  if (!user) {
+    return (
+      <div>
+        <h1 className="text-3xl font-semibold mb-8 border-b border-slate-200 pb-4">
+          My Registrations
+        </h1>
+
+        <div className="h-64 flex items-center justify-center">
+          <p className="text-lg text-slate-500 text-center">
+            Please log in first to view your participations.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
-      {/* Title like the second screenshot */}
+      {/* Title */}
       <h1 className="text-3xl font-semibold mb-8 border-b border-slate-200 pb-4">
         My Registrations
       </h1>

@@ -1,246 +1,212 @@
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import api from "../../api/axios";
-import Card from "../../components/ui/Card";
-import Button from "../../components/ui/Button";
-import StatCard from "../../components/ui/StatCard";
-import Sidebar from "../../components/layout/Sidebar";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { 
+  FaPlus, FaCalendarCheck, FaChartLine, FaUsers, FaBell, 
+  FaArrowRight 
+} from "react-icons/fa6";
 
 const AdminDashboard = () => {
-  const [stats, setStats] = useState({
-    totalEvents: 0,
-    totalRegistrations: 0,
-    events: [],
-  });
-  const [loading, setLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState("overview");
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    date: "",
-    time: "",
-    venue: "",
-    category: "Tech",
-  });
-
-  const fetchStats = async () => {
-    setLoading(true);
-    const { data } = await api.get("/api/events/admin/stats");
-    setStats(data);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleCreate = async (e) => {
-    e.preventDefault();
-    await api.post("/api/events", form);
-    setForm({
-      title: "",
-      description: "",
-      date: "",
-      time: "",
-      venue: "",
-      category: "Tech",
-    });
-    fetchStats();
-    setActiveSection("manage");
-  };
-
-  const handleDelete = async (id) => {
-    await api.delete(`/api/events/${id}`);
-    fetchStats();
-  };
-
+  const { user } = useAuth();
+  
   return (
-    <div className="flex gap-0">
-      {/* left sidebar */}
-      <Sidebar />
-
-      {/* main content */}
-      <main className="flex-1 px-4 py-6 max-w-5xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-5">
-          <div>
-            <h1 className="text-xl font-semibold">Admin dashboard</h1>
-            <p className="text-xs text-slate-400 mt-1">
-              Create, manage and track all campus events for your club.
-            </p>
-          </div>
-
-          {/* section tabs */}
-          <div className="inline-flex rounded-full bg-slate-900/70 border border-slate-800 p-1 text-xs">
-            {[
-              { id: "overview", label: "Overview" },
-              { id: "create", label: "Create event" },
-              { id: "manage", label: "Manage events" },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveSection(tab.id)}
-                className={`px-3 py-1 rounded-full transition ${
-                  activeSection === tab.id
-                    ? "bg-emerald-500 text-slate-950"
-                    : "text-slate-300 hover:text-emerald-200"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-8 max-w-7xl mx-auto px-4 py-8"
+    >
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row gap-8 items-start lg:items-center justify-between">
+        <div>
+          <h1 className="text-4xl lg:text-5xl font-black bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-3">
+            Welcome back, {user?.name}!
+          </h1>
+          <p className="text-xl text-slate-600">Manage your events and hosting platform.</p>
         </div>
-
-        {/* content grid */}
-        <div className="grid md:grid-cols-[1.2fr_1.5fr] gap-6">
-          {/* left column: stats + create form (conditional) */}
-          <div className="space-y-4">
-            {/* stats always visible */}
-            <div className="grid grid-cols-2 gap-3">
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <StatCard
-                  label="Total events"
-                  value={stats.totalEvents}
-                  accent="bg-emerald-500/70"
-                />
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <StatCard
-                  label="Total registrations"
-                  value={stats.totalRegistrations}
-                  accent="bg-lime-400/70"
-                />
-              </motion.div>
-            </div>
-
-            {/* create form only in create / overview */}
-            {(activeSection === "create" ||
-              activeSection === "overview") && (
-              <Card className="p-4">
-                <h2 className="text-sm font-semibold mb-3">
-                  Create new event
-                </h2>
-                <form
-                  onSubmit={handleCreate}
-                  className="grid grid-cols-1 gap-3 text-xs"
-                >
-                  <input
-                    placeholder="Title"
-                    name="title"
-                    value={form.title}
-                    onChange={handleChange}
-                    className="rounded-xl bg-slate-900/80 border border-slate-700 px-3 py-2 outline-none focus:border-emerald-500"
-                  />
-                  <textarea
-                    placeholder="Description"
-                    name="description"
-                    rows={3}
-                    value={form.description}
-                    onChange={handleChange}
-                    className="rounded-xl bg-slate-900/80 border border-slate-700 px-3 py-2 outline-none focus:border-emerald-500"
-                  />
-                  <div className="grid grid-cols-2 gap-3">
-                    <input
-                      type="date"
-                      name="date"
-                      value={form.date}
-                      onChange={handleChange}
-                      className="rounded-xl bg-slate-900/80 border border-slate-700 px-3 py-2 outline-none focus:border-emerald-500"
-                    />
-                    <input
-                      type="time"
-                      name="time"
-                      value={form.time}
-                      onChange={handleChange}
-                      className="rounded-xl bg-slate-900/80 border border-slate-700 px-3 py-2 outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                  <input
-                    placeholder="Venue"
-                    name="venue"
-                    value={form.venue}
-                    onChange={handleChange}
-                    className="rounded-xl bg-slate-900/80 border border-slate-700 px-3 py-2 outline-none focus:border-emerald-500"
-                  />
-                  <select
-                    name="category"
-                    value={form.category}
-                    onChange={handleChange}
-                    className="rounded-xl bg-slate-900/80 border border-slate-700 px-3 py-2 outline-none focus:border-emerald-500"
-                  >
-                    <option>Tech</option>
-                    <option>Cultural</option>
-                    <option>Sports</option>
-                    <option>Workshop</option>
-                  </select>
-                  <Button type="submit" className="py-2 mt-1 text-xs">
-                    Create event
-                  </Button>
-                </form>
-              </Card>
-            )}
-          </div>
-
-          {/* right column: manage list (always, but emphasized in manage) */}
-          <div>
-            <h2 className="text-sm font-semibold mb-3">
-              {activeSection === "manage"
-                ? "Manage events"
-                : "Recent events"}
-            </h2>
-            <div className="space-y-3 max-h-[32rem] overflow-y-auto pr-1">
-              {loading ? (
-                <p className="text-xs text-slate-400">
-                  Loading events...
-                </p>
-              ) : stats.events.length === 0 ? (
-                <p className="text-xs text-slate-400">
-                  No events yet. Create your first event.
-                </p>
-              ) : (
-                stats.events.map((event) => (
-                  <Card
-                    key={event._id}
-                    className="p-4 flex justify-between items-start"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold">
-                        {event.title}
-                      </p>
-                      <p className="text-xs text-slate-400 mt-1">
-                        {new Date(
-                          event.date
-                        ).toLocaleDateString()}{" "}
-                        · {event.time} · {event.venue}
-                      </p>
-                      <p className="text-[11px] text-emerald-400 mt-1">
-                        {event.registeredUsers.length} registrations
-                      </p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      className="text-[11px] px-2 py-1"
-                      onClick={() => handleDelete(event._id)}
-                    >
-                      Delete
-                    </Button>
-                  </Card>
-                ))
-              )}
+        <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-8 rounded-3xl shadow-2xl flex-1 max-w-sm">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">📅</div>
+            <div>
+              <p className="text-sm opacity-90">Next Event</p>
+              <p className="text-2xl font-bold">TechFest 2025</p>
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <motion.div 
+          whileHover={{ scale: 1.02, y: -4 }}
+          className="group bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-8 rounded-3xl shadow-2xl hover:shadow-3xl cursor-pointer border-4 border-transparent hover:border-white/30 transition-all duration-300"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-blue-100 text-sm font-semibold uppercase tracking-wide mb-2 opacity-90">Host Event</p>
+              <p className="text-2xl lg:text-3xl font-black mb-3">Create New</p>
+              <p className="text-blue-100 text-sm opacity-80">Start hosting competitions instantly</p>
+            </div>
+            <FaPlus className="w-12 h-12 text-blue-200 group-hover:scale-110 transition-transform duration-300" />
+          </div>
+          <Link 
+            to="/admin/create-event"
+            className="mt-4 inline-flex items-center gap-2 text-white font-semibold hover:text-blue-100 transition-colors"
+          >
+            Host Now <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </motion.div>
+
+        <motion.div 
+          whileHover={{ scale: 1.02, y: -4 }}
+          className="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-xl hover:shadow-2xl border border-slate-200/50 group cursor-pointer"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-3">Manage Events</p>
+              <p className="text-3xl font-black text-slate-900 mb-1">12</p>
+              <p className="text-emerald-600 font-semibold text-sm">Active Events</p>
+            </div>
+            <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all">
+              <FaCalendarCheck />
+            </div>
+          </div>
+          <Link to="/admin/manage-events" className="mt-4 inline-flex items-center gap-2 text-slate-700 font-semibold hover:text-slate-900 transition-colors">
+            View Events <FaArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </motion.div>
+
+        <motion.div 
+          whileHover={{ scale: 1.02, y: -4 }}
+          className="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-xl hover:shadow-2xl border border-slate-200/50 group cursor-pointer"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-3">View Analytics</p>
+              <p className="text-3xl font-black text-slate-900 mb-1">5.6K</p>
+              <p className="text-purple-600 font-semibold text-sm">Total Registrations</p>
+            </div>
+            <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all">
+              <FaChartLine />
+            </div>
+          </div>
+          <Link to="/admin/analytics" className="mt-4 inline-flex items-center gap-2 text-slate-700 font-semibold hover:text-slate-900 transition-colors">
+            View Analytics <FaArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </motion.div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div 
+          className="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all border border-slate-200/50 group" 
+          whileHover={{ y: -5 }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-3">Total Events</p>
+              <p className="text-4xl font-black text-slate-900">1,234</p>
+              <p className="text-emerald-600 font-semibold text-sm mt-1">+12% from last week</p>
+            </div>
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all">
+              📊
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div 
+          className="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all border border-slate-200/50 group" 
+          whileHover={{ y: -5 }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-3">Registrations</p>
+              <p className="text-4xl font-black text-slate-900">5,678</p>
+              <p className="text-emerald-600 font-semibold text-sm mt-1">+28% from last week</p>
+            </div>
+            <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all">
+              📈
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div 
+          className="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all border border-slate-200/50 group" 
+          whileHover={{ y: -5 }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-3">Pending</p>
+              <p className="text-4xl font-black text-slate-900">23</p>
+              <p className="text-orange-600 font-semibold text-sm mt-1">-2% from last week</p>
+            </div>
+            <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all">
+              ⏳
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div 
+          className="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all border border-slate-200/50 group" 
+          whileHover={{ y: -5 }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-3">Queries</p>
+              <p className="text-4xl font-black text-slate-900">156</p>
+              <p className="text-emerald-600 font-semibold text-sm mt-1">+15% from last week</p>
+            </div>
+            <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all">
+              💬
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Recent Activity / Notifications */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200/50 overflow-hidden"
+      >
+        <div className="p-8 border-b border-slate-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center">
+                <FaBell />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">Recent Activity</h3>
+                <p className="text-sm text-slate-500">Stay updated with your events</p>
+              </div>
+            </div>
+            <Link to="/admin/notifications" className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1">
+              View All <FaArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+        <div className="divide-y divide-slate-100">
+          {[
+            { title: "TechFest 2025", desc: "45 new registrations", time: "2h ago", icon: "📈" },
+            { title: "Hackathon Round 1", desc: "Results published", time: "5h ago", icon: "✅" },
+            { title: "New query received", desc: "From participant John Doe", time: "1d ago", icon: "💬" }
+          ].map((activity, index) => (
+            <div key={index} className="p-6 hover:bg-slate-50 transition-colors">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xl">{activity.icon}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-slate-900 text-sm line-clamp-1">{activity.title}</p>
+                  <p className="text-slate-600 text-sm mt-1 line-clamp-1">{activity.desc}</p>
+                  <p className="text-xs text-slate-500 mt-2">{activity.time}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

@@ -17,7 +17,7 @@ const Footer = () => {
                 </span>
               </div> */}
               <span className="text-xl lg:text-2xl text-slate-900">
-            DNICA<span className="text-[#fa8c16]">EventHub</span>
+            CLG<span className="text-[#fa8c16]">EventHub</span>
           </span>
             </div>
             <p className="text-sm text-slate-500 max-w-xs">

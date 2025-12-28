@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { ADMIN_CREDENTIALS } from "../../utils/adminConfig";
 import Button from "../../components/ui/Button";
 import { toast } from "react-toastify";
 import { signInWithPopup } from "firebase/auth";
@@ -22,7 +23,6 @@ const Register = () => {
     phone: "",
     password: "",
     confirmPassword: "",
-    role: "student",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -40,6 +40,14 @@ const Register = () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
+      
+      // Block admin email from Google signup
+      if (user.email === ADMIN_CREDENTIALS.email) {
+        setError("Admin access is predefined. Use direct admin credentials.");
+        setLoading(false);
+        return;
+      }
+
       const idToken = await user.getIdToken();
 
       login({
@@ -73,6 +81,12 @@ const Register = () => {
       return;
     }
 
+    // Block admin email from signup
+    if (form.email === ADMIN_CREDENTIALS.email) {
+      setError("Admin email is predefined. Use student email for signup.");
+      return;
+    }
+
     setLoading(true);
     try {
       const { data } = await api.post("/api/auth/register", {
@@ -80,9 +94,16 @@ const Register = () => {
         email: form.email,
         phone: form.phone,
         password: form.password,
-        role: "student",
+        role: "student", // Always student
       });
-      login(data);
+      
+      const result = login(data);
+      
+      if (!result?.success) {
+        setError(result?.message || "Registration failed");
+        return;
+      }
+      
       toast.success("Account created successfully!", {
         style: { background: "#16a34a", color: "#fff" },
       });
@@ -103,7 +124,7 @@ const Register = () => {
             Join DNICA EventHub
           </h2>
           <p className="text-xs sm:text-sm text-orange-50">
-            Create your student account and start exploring college events and clubs.
+            Create your <strong>student</strong> account and start exploring college events.
           </p>
         </div>
 
@@ -111,7 +132,7 @@ const Register = () => {
         <div className="mb-6 text-center">
           <h3 className="text-lg font-semibold text-slate-900">Sign Up as Student</h3>
           <p className="text-xs text-slate-500">
-            Fill in your details to create your student account.
+            Admin access is predefined. Students only for signup.
           </p>
         </div>
 
@@ -173,7 +194,7 @@ const Register = () => {
                 value={form.email}
                 onChange={handleChange}
                 className="w-full bg-transparent py-2 text-sm outline-none"
-                placeholder="Enter your email address"
+                placeholder="Enter your student email"
                 required
               />
             </div>
