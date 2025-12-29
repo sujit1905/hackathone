@@ -23,77 +23,9 @@ const AdminDashboard = () => {
           </h1>
           <p className="text-xl text-slate-600">Manage your events and hosting platform.</p>
         </div>
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-8 rounded-3xl shadow-2xl flex-1 max-w-sm">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">📅</div>
-            <div>
-              <p className="text-sm opacity-90">Next Event</p>
-              <p className="text-2xl font-bold">TechFest 2025</p>
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        <motion.div 
-          whileHover={{ scale: 1.02, y: -4 }}
-          className="group bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-8 rounded-3xl shadow-2xl hover:shadow-3xl cursor-pointer border-4 border-transparent hover:border-white/30 transition-all duration-300"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-blue-100 text-sm font-semibold uppercase tracking-wide mb-2 opacity-90">Host Event</p>
-              <p className="text-2xl lg:text-3xl font-black mb-3">Create New</p>
-              <p className="text-blue-100 text-sm opacity-80">Start hosting competitions instantly</p>
-            </div>
-            <FaPlus className="w-12 h-12 text-blue-200 group-hover:scale-110 transition-transform duration-300" />
-          </div>
-          <Link 
-            to="/admin/create-event"
-            className="mt-4 inline-flex items-center gap-2 text-white font-semibold hover:text-blue-100 transition-colors"
-          >
-            Host Now <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </motion.div>
-
-        <motion.div 
-          whileHover={{ scale: 1.02, y: -4 }}
-          className="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-xl hover:shadow-2xl border border-slate-200/50 group cursor-pointer"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-3">Manage Events</p>
-              <p className="text-3xl font-black text-slate-900 mb-1">12</p>
-              <p className="text-emerald-600 font-semibold text-sm">Active Events</p>
-            </div>
-            <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all">
-              <FaCalendarCheck />
-            </div>
-          </div>
-          <Link to="/admin/manage-events" className="mt-4 inline-flex items-center gap-2 text-slate-700 font-semibold hover:text-slate-900 transition-colors">
-            View Events <FaArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </motion.div>
-
-        <motion.div 
-          whileHover={{ scale: 1.02, y: -4 }}
-          className="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-xl hover:shadow-2xl border border-slate-200/50 group cursor-pointer"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-3">View Analytics</p>
-              <p className="text-3xl font-black text-slate-900 mb-1">5.6K</p>
-              <p className="text-purple-600 font-semibold text-sm">Total Registrations</p>
-            </div>
-            <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all">
-              <FaChartLine />
-            </div>
-          </div>
-          <Link to="/admin/analytics" className="mt-4 inline-flex items-center gap-2 text-slate-700 font-semibold hover:text-slate-900 transition-colors">
-            View Analytics <FaArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </motion.div>
-      </div>
+    
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
