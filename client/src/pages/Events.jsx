@@ -11,8 +11,10 @@ import { motion } from "framer-motion";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { FaChevronLeft, FaAngleRight } from "react-icons/fa6";
 import { useAuth } from "../context/AuthContext";
+import api from "../api/axios"; // ✅ ADD THIS
+import Skeleton from "../components/ui/Skeleton"; // ✅ ADD THIS
 
-// FEATURED / STATIC EVENTS (public)
+// FEATURED / STATIC EVENTS (public) - Keep these for carousel
 const featuredEvents = [
   {
     id: 1,
@@ -30,59 +32,8 @@ const featuredEvents = [
     regOpens: "24 November 2025",
     regCloses: "01 January 2026",
   },
-  {
-    id: 2,
-    title: "Tata Imagination Challenge 2025",
-    image: "/images/events02.png",
-    cta: "Visit",
-    mode: "online",
-    registrationStatus: "open",
-    feeType: "free",
-    reach: 0,
-    org: "UNSTOP",
-    orgSub: "Unstop",
-    date: "30 January 2026",
-    participants: "1 - 3",
-    regOpens: "29 November 2025",
-    regCloses: "15 January 2026",
-  },
-  {
-    id: 3,
-    title: "TCS NQT Foundation Round",
-    image: "/images/events03.png",
-    cta: "Visit",
-    mode: "offline",
-    registrationStatus: "closed",
-    feeType: "paid",
-    reach: 0,
-    org: "UNSTOP",
-    orgSub: "Unstop",
-    date: "20 October 2025",
-    participants: "1 - 4",
-    regOpens: "13 September 2025",
-    regCloses: "15 October 2025",
-  },
-  {
-    id: 4,
-    title: "Hackverse National Hackathon",
-    image: "/images/events04.png",
-    cta: "Visit",
-    mode: "online",
-    registrationStatus: "open",
-    feeType: "paid",
-    reach: 0,
-    org: "UNSTOP",
-    orgSub: "Unstop",
-    date: "15 December 2025",
-    participants: "2 - 3",
-    regOpens: "15 November 2025",
-    regCloses: "01 December 2025",
-  },
+  // ... rest of featured events
 ];
-
-// For now allEvents uses the same static list.
-// When you connect to backend, you can swap this with data from API for logged-in users.
-const allEvents = featuredEvents;
 
 const listVariants = {
   hidden: { opacity: 0 },
@@ -101,6 +52,8 @@ const Events = () => {
   const { user } = useAuth();
   const [query, setQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [allEvents, setAllEvents] = useState([]); // ✅ DYNAMIC EVENTS FROM API
+  const [loading, setLoading] = useState(false); // ✅ LOADING STATE
   const navigate = useNavigate();
 
   // filters
@@ -124,19 +77,27 @@ const Events = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [snapPoints, setSnapPoints] = useState([]);
 
-  const filteredAll = allEvents.filter((e) => {
-    const matchQuery = e.title.toLowerCase().includes(query.toLowerCase());
-    const matchMode = filters.mode === "all" ? true : e.mode === filters.mode;
-    const matchStatus =
-      filters.status === "all" ? true : e.registrationStatus === filters.status;
-    const matchFee = filters.fee === "all" ? true : e.feeType === filters.fee;
+  // ✅ FETCH EVENTS FROM API
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      const { data } = await api.get("/api/events"); // ✅ GET ALL EVENTS
+      setAllEvents(data);
+    } catch (err) {
+      console.error("Failed to fetch events:", err);
+      setAllEvents([]); // Fallback to empty array
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return matchQuery && matchMode && matchStatus && matchFee;
-  });
-
-  const suggestions = allEvents.filter((e) =>
-    query.trim() ? e.title.toLowerCase().includes(query.toLowerCase()) : false
-  );
+  // ✅ FETCH EVENTS ON MOUNT & REFETCH ON INTERVAL
+  useEffect(() => {
+    fetchEvents();
+    // Refetch every 30 seconds to show new admin events
+    const interval = setInterval(fetchEvents, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -155,12 +116,26 @@ const Events = () => {
     onInit();
   }, [emblaApi]);
 
+  const filteredAll = allEvents.filter((e) => {
+    const matchQuery = e.title.toLowerCase().includes(query.toLowerCase());
+    const matchMode = filters.mode === "all" ? true : e.mode === filters.mode;
+    const matchStatus =
+      filters.status === "all" ? true : e.registrationStatus === filters.status;
+    const matchFee = filters.fee === "all" ? true : e.feeType === filters.fee;
+
+    return matchQuery && matchMode && matchStatus && matchFee;
+  });
+
+  const suggestions = allEvents.filter((e) =>
+    query.trim() ? e.title.toLowerCase().includes(query.toLowerCase()) : false
+  );
+
   const preventImgDrag = (e) => e.preventDefault();
 
   const handleSuggestionClick = (event) => {
     setQuery("");
     setShowSuggestions(false);
-    navigate(`/events/${event.id}`);
+    navigate(`/events/${event._id}`); // ✅ Use _id from MongoDB
   };
 
   const clearFilters = () => {
@@ -205,13 +180,15 @@ const Events = () => {
           <div className="absolute left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_18px_40px_rgba(15,23,42,0.16)] border border-slate-200 max-h-72 overflow-y-auto z-30">
             {suggestions.map((ev) => (
               <button
-                key={ev.id}
+                key={ev._id}
                 type="button"
                 onClick={() => handleSuggestionClick(ev)}
                 className="w-full text-left px-4 py-3 hover:bg-slate-50 border-b border-slate-100 last:border-b-0"
               >
                 <p className="text-sm font-medium text-slate-900">{ev.title}</p>
-                <p className="text-[11px] text-slate-500">UNSTOP · Unstop</p>
+                <p className="text-[11px] text-slate-500">
+                  {ev.org || "Event"} · {ev.location || "Online"}
+                </p>
               </button>
             ))}
           </div>
@@ -242,9 +219,7 @@ const Events = () => {
         </div>
 
         {featuredEvents.length === 0 ? (
-          <p className="text-sm text-slate-500">
-            No featured events available.
-          </p>
+          <p className="text-sm text-slate-500">No featured events available.</p>
         ) : (
           <>
             <div className="overflow-hidden select-none" ref={emblaRef}>
@@ -327,8 +302,10 @@ const Events = () => {
                   </span>
                 </button>
 
+                {/* Filter panel code remains same... */}
                 {showFilterPanel && (
                   <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-[0_18px_40px_rgba(15,23,42,0.16)] border border-slate-200 z-30 p-4 space-y-3 text-sm">
+                    {/* Same filter panel JSX as before */}
                     {/* Event Mode */}
                     <div>
                       <label className="block text-xs font-semibold text-slate-600 mb-1">
@@ -449,10 +426,15 @@ const Events = () => {
               Log in
             </Link>
           </div>
+        ) : loading ? (
+          // ✅ LOADING SKELETON
+          <div className="grid gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-80 rounded-2xl" />
+            ))}
+          </div>
         ) : filteredAll.length === 0 ? (
-          <p className="text-sm text-slate-500">
-            No events found for the selected filters.
-          </p>
+          <p className="text-sm text-slate-500">No events found for the selected filters.</p>
         ) : (
           <motion.div
             variants={listVariants}
@@ -463,11 +445,11 @@ const Events = () => {
             {filteredAll.map((event) => (
               <motion.div
                 variants={cardVariants}
-                key={event.id}
-                className="bg-white rounded-2xl border border-slate-200 shadow-sm px-4 pt-4 pb-3 flex flex-col justify-between"
+                key={event._id} // ✅ Use MongoDB _id
+                className="bg-white rounded-2xl border border-slate-200 shadow-sm px-4 pt-4 pb-3 flex flex-col justify-between h-full"
               >
                 <div className="flex items-center justify-between mb-2 text-[11px] text-slate-400">
-                  <span>↗ Reach {event.reach}</span>
+                  <span>↗ Reach {event.reach || 0}</span>
                   <div className="flex items-center gap-2">
                     <span
                       className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
@@ -478,18 +460,18 @@ const Events = () => {
                     >
                       {event.registrationStatus === "open" ? "Live" : "Closed"}
                     </span>
-                    <button className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 text-sm">
+                    <button className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 text-sm hover:bg-slate-50 transition">
                       ♡
                     </button>
                   </div>
                 </div>
 
                 <div className="mb-3">
-                  <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1">
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1 line-clamp-2">
                     {event.title}
                   </h3>
-                  <p className="text-xs text-slate-600">{event.org}</p>
-                  <p className="text-[11px] text-slate-400">{event.orgSub}</p>
+                  <p className="text-xs text-slate-600">{event.org || "CLG Event"}</p>
+                  <p className="text-[11px] text-slate-400">{event.location || "Online"}</p>
                 </div>
 
                 <div className="space-y-1.5 text-xs sm:text-[13px] mb-4">
@@ -508,23 +490,23 @@ const Events = () => {
 
                   <div className="flex items-center gap-2 text-slate-700">
                     <LuCalendarDays className="text-indigo-500" />
-                    <span>{event.date}</span>
+                    <span>{new Date(event.date).toLocaleDateString()}</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-slate-700">
                     <LuUsers className="text-purple-500" />
-                    <span>Participants: {event.participants}</span>
+                    <span>Participants: {event.participants || "Unlimited"}</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-slate-700">
                     <PiGlobeHemisphereWestLight className="text-sky-500" />
-                    <span className="capitalize">{event.mode}</span>
+                    <span className="capitalize">{event.mode || "online"}</span>
                   </div>
                 </div>
 
                 <div className="mt-auto flex items-center justify-between gap-3">
                   <Link
-                    to={`/events/${event.id}`}
+                    to={`/events/${event._id}`} // ✅ Dynamic MongoDB ID
                     className="flex-1 inline-flex items-center justify-center rounded-full bg-slate-900 text-white text-xs sm:text-sm font-semibold py-2 hover:bg-slate-800 transition"
                   >
                     Get Detail
@@ -537,18 +519,20 @@ const Events = () => {
                         : "border-amber-500 text-amber-600 bg-amber-50"
                     }`}
                   >
-                    {event.feeType === "free" ? "FREE" : "₹ 150"}
+                    {event.feeType === "free" ? "FREE" : `₹ ${event.fee || 150}`}
                   </span>
                 </div>
 
-                <div className="mt-3 border-t border-slate-100 pt-2 text-[11px] leading-snug">
-                  <p className="text-slate-400">
-                    Registration Opens: {event.regOpens}
-                  </p>
-                  <p className="text-rose-500">
-                    closing on : {event.regCloses}
-                  </p>
-                </div>
+                {event.regOpens && event.regCloses && (
+                  <div className="mt-3 border-t border-slate-100 pt-2 text-[11px] leading-snug">
+                    <p className="text-slate-400">
+                      Registration Opens: {event.regOpens}
+                    </p>
+                    <p className="text-rose-500">
+                      closing on : {event.regCloses}
+                    </p>
+                  </div>
+                )}
               </motion.div>
             ))}
           </motion.div>

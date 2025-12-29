@@ -1,7 +1,7 @@
 import UserProfile from '../models/UserProfile.js';
 import User from '../models/User.js';
 import EventRegistration from '../models/EventRegistration.js';
-import Event from '../models/Event.js';
+import Event from '../models/Event.js'; // Keep same - model now exists
 import Certificate from '../models/Certificate.js';
 
 // 🔥 GET USER PROFILE

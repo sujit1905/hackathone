@@ -19,8 +19,24 @@ const Navbar = () => {
     toast.success("Logged out successfully!", {
       style: { background: "#16a34a", color: "#fff" },
     });
-    navigate("/login");
+    navigate("/");
     setOpen(false);
+  };
+
+  // Handle My Participations click - show message if not logged in
+  const handleMyEventsClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      toast.info("Please log in first to see your participations!", {
+        style: { 
+          background: "linear-gradient(135deg, #3b82f6, #1d4ed8)", 
+          color: "#fff",
+          borderRadius: "12px",
+          boxShadow: "0 4px 20px rgba(59, 130, 246, 0.3)"
+        },
+      });
+      return false;
+    }
   };
 
   const navLinkClass = ({ isActive }) =>
@@ -52,7 +68,11 @@ const Navbar = () => {
           <NavLink to="/events" className={navLinkClass}>
             Events
           </NavLink>
-          <NavLink to="/my-events" className={navLinkClass}>
+          <NavLink 
+            to="/my-events" 
+            className={navLinkClass}
+            onClick={handleMyEventsClick}
+          >
             My Participations
           </NavLink>
         </div>
@@ -290,7 +310,10 @@ const Navbar = () => {
                         : "border-slate-100 text-slate-600"
                     }`
                   }
-                  onClick={() => setOpen(false)}
+                  onClick={(e) => {
+                    setOpen(false);
+                    handleMyEventsClick(e);
+                  }}
                 >
                   My Participations
                 </NavLink>
