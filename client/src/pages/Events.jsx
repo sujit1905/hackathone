@@ -1,4 +1,3 @@
-// src/pages/Events.jsx
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CiSearch } from "react-icons/ci";
@@ -11,29 +10,8 @@ import { motion } from "framer-motion";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { FaChevronLeft, FaAngleRight } from "react-icons/fa6";
 import { useAuth } from "../context/AuthContext";
-import api from "../api/axios"; // ✅ ADD THIS
-import Skeleton from "../components/ui/Skeleton"; // ✅ ADD THIS
-
-// FEATURED / STATIC EVENTS (public) - Keep these for carousel
-const featuredEvents = [
-  {
-    id: 1,
-    title: "Aditya Birla Group Engenuity 2025",
-    image: "/images/events01.png",
-    cta: "Visit",
-    mode: "online",
-    registrationStatus: "open",
-    feeType: "free",
-    reach: 0,
-    org: "UNSTOP",
-    orgSub: "Unstop",
-    date: "30 November 2025",
-    participants: "2 - 3",
-    regOpens: "24 November 2025",
-    regCloses: "01 January 2026",
-  },
-  // ... rest of featured events
-];
+import api from "../api/axios";
+import Skeleton from "../components/ui/Skeleton";
 
 const listVariants = {
   hidden: { opacity: 0 },
@@ -52,8 +30,9 @@ const Events = () => {
   const { user } = useAuth();
   const [query, setQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [allEvents, setAllEvents] = useState([]); // ✅ DYNAMIC EVENTS FROM API
-  const [loading, setLoading] = useState(false); // ✅ LOADING STATE
+  const [allEvents, setAllEvents] = useState([]);
+  const [featuredEvents, setFeaturedEvents] = useState([]);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // filters
@@ -77,24 +56,66 @@ const Events = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [snapPoints, setSnapPoints] = useState([]);
 
-  // ✅ FETCH EVENTS FROM API
+  // Safe event processing with defaults
+  const processEvents = (data) => {
+    return data.map(event => ({
+      ...event,
+      title: event.title || 'Untitled Event',
+      org: event.org || 'CLG EventHub',
+      location: event.location || 'Online',
+      mode: event.mode || 'online',
+      feeType: event.feeType || 'free',
+      registrationStatus: event.registrationStatus || 'open',
+      participants: event.participants || 'Unlimited',
+      image: event.image || '/images/events01.png',
+      reach: event.reach || 0,
+      date: event.date || new Date(),
+      // Ensure visibility is set
+      visibility: event.visibility || 'public',
+      // Ensure isFeatured is boolean
+      isFeatured: event.isFeatured === true
+    }));
+  };
+
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const { data } = await api.get("/api/events"); // ✅ GET ALL EVENTS
-      setAllEvents(data);
+      console.log("📡 Fetching events from API...");
+      
+      const { data } = await api.get("/api/events");
+      
+      console.log("✅ RAW API DATA received:", data.length, "events");
+      
+      if (data.length > 0) {
+        console.log("📋 Sample event from API:", {
+          title: data[0].title,
+          visibility: data[0].visibility,
+          isFeatured: data[0].isFeatured,
+          createdBy: data[0].createdBy
+        });
+      }
+      
+      const eventsWithDefaults = processEvents(data);
+      
+      // Set featured events (only those with isFeatured: true)
+      const featured = eventsWithDefaults.filter(e => e.isFeatured).slice(0, 5);
+      setFeaturedEvents(featured);
+      setAllEvents(eventsWithDefaults);
+      
+      console.log(`🎯 Featured events: ${featured.length}`);
+      console.log(`📊 All events: ${eventsWithDefaults.length}`);
+      
     } catch (err) {
-      console.error("Failed to fetch events:", err);
-      setAllEvents([]); // Fallback to empty array
+      console.error("❌ FETCH ERROR:", err);
+      setFeaturedEvents([]);
+      setAllEvents([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ FETCH EVENTS ON MOUNT & REFETCH ON INTERVAL
   useEffect(() => {
     fetchEvents();
-    // Refetch every 30 seconds to show new admin events
     const interval = setInterval(fetchEvents, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -116,26 +137,29 @@ const Events = () => {
     onInit();
   }, [emblaApi]);
 
+  // Safe filtering (NO CRASHES)
   const filteredAll = allEvents.filter((e) => {
-    const matchQuery = e.title.toLowerCase().includes(query.toLowerCase());
+    const title = e.title || '';
+    const matchQuery = title.toLowerCase().includes(query.toLowerCase());
     const matchMode = filters.mode === "all" ? true : e.mode === filters.mode;
-    const matchStatus =
-      filters.status === "all" ? true : e.registrationStatus === filters.status;
+    const matchStatus = filters.status === "all" ? true : e.registrationStatus === filters.status;
     const matchFee = filters.fee === "all" ? true : e.feeType === filters.fee;
 
     return matchQuery && matchMode && matchStatus && matchFee;
   });
 
-  const suggestions = allEvents.filter((e) =>
-    query.trim() ? e.title.toLowerCase().includes(query.toLowerCase()) : false
-  );
+  // Safe suggestions
+  const suggestions = allEvents.filter((e) => {
+    const title = e.title || '';
+    return query.trim() ? title.toLowerCase().includes(query.toLowerCase()) : false;
+  });
 
   const preventImgDrag = (e) => e.preventDefault();
 
   const handleSuggestionClick = (event) => {
     setQuery("");
     setShowSuggestions(false);
-    navigate(`/events/${event._id}`); // ✅ Use _id from MongoDB
+    navigate(`/events/${event._id}`);
   };
 
   const clearFilters = () => {
@@ -187,7 +211,7 @@ const Events = () => {
               >
                 <p className="text-sm font-medium text-slate-900">{ev.title}</p>
                 <p className="text-[11px] text-slate-500">
-                  {ev.org || "Event"} · {ev.location || "Online"}
+                  {ev.org} · {ev.location}
                 </p>
               </button>
             ))}
@@ -195,12 +219,11 @@ const Events = () => {
         )}
       </div>
 
-      {/* Featured section (always visible) */}
+      {/* Featured section */}
       <section className="mb-10">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl md:text-3xl font-semibold text-slate-900">
-            <span className="border-b-4 border-[#f7a900] pb-1">Featured</span>{" "}
-            events
+            <span className="border-b-4 border-[#f7a900] pb-1">Featured</span> events
           </h2>
           <div className="hidden sm:flex gap-3">
             <button
@@ -226,7 +249,7 @@ const Events = () => {
               <div className="flex gap-4">
                 {featuredEvents.map((event) => (
                   <div
-                    key={event.id}
+                    key={event._id}
                     className="flex-[0_0_80%] sm:flex-[0_0_48%] lg:flex-[0_0_32%] bg-white rounded-[18px] shadow-sm border border-slate-200 overflow-hidden"
                   >
                     <div className="h-44 sm:h-52 bg-slate-100">
@@ -243,10 +266,10 @@ const Events = () => {
                         {event.title}
                       </p>
                       <Link
-                        to={`/events/${event.id}`}
+                        to={`/events/${event._id}`}
                         className="inline-flex items-center gap-1 whitespace-nowrap text-xs sm:text-sm px-3 py-1.5 rounded-full bg-slate-900 text-white"
                       >
-                        {event.cta}
+                        Visit
                         <FaArrowRightLong className="text-[10px]" />
                       </Link>
                     </div>
@@ -270,14 +293,13 @@ const Events = () => {
         )}
       </section>
 
-      {/* All events / gated section */}
+      {/* All events section */}
       <section className="mt-6">
         <div className="flex items-center justify-between mb-4 gap-4">
           <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">
             <span className="border-b-4 border-[#f7a900] pb-1">All</span> Events
           </h2>
 
-          {/* Show filters only when logged in */}
           {user && (
             <div className="flex items-center gap-3">
               <button
@@ -302,15 +324,11 @@ const Events = () => {
                   </span>
                 </button>
 
-                {/* Filter panel code remains same... */}
                 {showFilterPanel && (
                   <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-[0_18px_40px_rgba(15,23,42,0.16)] border border-slate-200 z-30 p-4 space-y-3 text-sm">
-                    {/* Same filter panel JSX as before */}
                     {/* Event Mode */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1">
-                        Event Mode
-                      </label>
+                      <label className="block text-xs font-semibold text-slate-600 mb-1">Event Mode</label>
                       <div className="relative">
                         <select
                           value={filters.mode}
@@ -337,17 +355,12 @@ const Events = () => {
 
                     {/* Registration Status */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1">
-                        Registration Status
-                      </label>
+                      <label className="block text-xs font-semibold text-slate-600 mb-1">Registration Status</label>
                       <div className="relative">
                         <select
                           value={filters.status}
                           onChange={(e) => {
-                            setFilters((f) => ({
-                              ...f,
-                              status: e.target.value,
-                            }));
+                            setFilters((f) => ({ ...f, status: e.target.value }));
                             setIsStatusOpen(false);
                             e.target.blur();
                           }}
@@ -369,9 +382,7 @@ const Events = () => {
 
                     {/* Fee */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1">
-                        Fee
-                      </label>
+                      <label className="block text-xs font-semibold text-slate-600 mb-1">Fee</label>
                       <div className="relative">
                         <select
                           value={filters.fee}
@@ -409,15 +420,13 @@ const Events = () => {
           )}
         </div>
 
-        {/* If not logged in, show prompt instead of all events */}
         {!user ? (
           <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center">
             <p className="text-base sm:text-lg font-semibold text-slate-800 mb-2">
               Log in to explore all events
             </p>
             <p className="text-sm text-slate-500 mb-4">
-              You can see a few featured events above. Sign in to unlock the full list,
-              filters, and registrations.
+              You can see featured events above. Sign in to unlock the full list, filters, and registrations.
             </p>
             <Link
               to="/login"
@@ -427,7 +436,6 @@ const Events = () => {
             </Link>
           </div>
         ) : loading ? (
-          // ✅ LOADING SKELETON
           <div className="grid gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <Skeleton key={i} className="h-80 rounded-2xl" />
@@ -445,11 +453,11 @@ const Events = () => {
             {filteredAll.map((event) => (
               <motion.div
                 variants={cardVariants}
-                key={event._id} // ✅ Use MongoDB _id
+                key={event._id}
                 className="bg-white rounded-2xl border border-slate-200 shadow-sm px-4 pt-4 pb-3 flex flex-col justify-between h-full"
               >
                 <div className="flex items-center justify-between mb-2 text-[11px] text-slate-400">
-                  <span>↗ Reach {event.reach || 0}</span>
+                  <span>↗ Reach {event.reach}</span>
                   <div className="flex items-center gap-2">
                     <span
                       className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
@@ -470,8 +478,8 @@ const Events = () => {
                   <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1 line-clamp-2">
                     {event.title}
                   </h3>
-                  <p className="text-xs text-slate-600">{event.org || "CLG Event"}</p>
-                  <p className="text-[11px] text-slate-400">{event.location || "Online"}</p>
+                  <p className="text-xs text-slate-600">{event.org}</p>
+                  <p className="text-[11px] text-slate-400">{event.location}</p>
                 </div>
 
                 <div className="space-y-1.5 text-xs sm:text-[13px] mb-4">
@@ -495,18 +503,18 @@ const Events = () => {
 
                   <div className="flex items-center gap-2 text-slate-700">
                     <LuUsers className="text-purple-500" />
-                    <span>Participants: {event.participants || "Unlimited"}</span>
+                    <span>Participants: {event.participants}</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-slate-700">
                     <PiGlobeHemisphereWestLight className="text-sky-500" />
-                    <span className="capitalize">{event.mode || "online"}</span>
+                    <span className="capitalize">{event.mode}</span>
                   </div>
                 </div>
 
                 <div className="mt-auto flex items-center justify-between gap-3">
                   <Link
-                    to={`/events/${event._id}`} // ✅ Dynamic MongoDB ID
+                    to={`/events/${event._id}`}
                     className="flex-1 inline-flex items-center justify-center rounded-full bg-slate-900 text-white text-xs sm:text-sm font-semibold py-2 hover:bg-slate-800 transition"
                   >
                     Get Detail
@@ -526,10 +534,10 @@ const Events = () => {
                 {event.regOpens && event.regCloses && (
                   <div className="mt-3 border-t border-slate-100 pt-2 text-[11px] leading-snug">
                     <p className="text-slate-400">
-                      Registration Opens: {event.regOpens}
+                      Registration Opens: {new Date(event.regOpens).toLocaleDateString()}
                     </p>
                     <p className="text-rose-500">
-                      closing on : {event.regCloses}
+                      closing on: {new Date(event.regCloses).toLocaleDateString()}
                     </p>
                   </div>
                 )}
